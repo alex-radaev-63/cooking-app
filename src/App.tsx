@@ -4,10 +4,14 @@ import Navbar from "./Components/Navbar";
 import Recipes from "./Pages/Recipes";
 import Groceries from "./Pages/Groceries";
 import Dashboard from "./Pages/Dashboard";
+import SideBar from "./Components/SideBar";
 
 function App() {
   return (
-    <>
+    <div className="flex w-screen h-screen bg-gray-800">
+      <SideBar />
+    </div>
+    /* <>
       <Router>
         <Navbar />
         <Routes>
@@ -16,7 +20,7 @@ function App() {
           <Route path="/groceries" element={<Groceries />} />
         </Routes>
       </Router>
-    </>
+    </> */
   );
 }
 
