@@ -1,7 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Gluten:wght@100..900&display=swap');
 @import "tailwindcss";
+
+html {
+    background-color: var(--color-slate-900);
+}
 
 @theme {
     /*--color-gray-900: #202225;*/
+    --font-gluten:'Gluten', cursive;
 }
 
 @layer components {
@@ -17,5 +23,20 @@
         @apply absolute w-auto p-2 m-2 min-w-max left-14
         rounded-md shadow-md text-white bg-gray-900
         text-xs font-bold transition-all duration-100 scale-0 origin-left;
+    }
+
+    .main-nav-link {
+        @apply  flex px-4 items-center rounded-lg bg-none hover:bg-slate-700 
+        hover:cursor-pointer transition-all duration-200 ease-out;
+    }
+
+    .btn-primary {
+        @apply px-4 rounded-lg bg-green-300/25 border-[1.5px]
+         border-green-300/25 text-green-300/75 font-medium cursor-pointer
+          hover:bg-green-300 hover:text-black transition-all duration-300 ease-out;
+    }
+
+    h1 {
+        @apply text-white/15 text-2xl;
     }
 }
