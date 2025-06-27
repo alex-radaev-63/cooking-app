@@ -4,14 +4,18 @@ import Navbar from "./Components/Navbar";
 import Recipes from "./Pages/Recipes";
 import Groceries from "./Pages/Groceries";
 import Dashboard from "./Pages/Dashboard";
-import SideBar from "./Components/SideBar";
+//import SideBar from "./Components/SideBar";
 
 function App() {
   return (
+    /* Test side bar component (learning to apply tailwind classes)
+
     <div className="flex w-screen h-screen bg-gray-800">
       <SideBar />
-    </div>
-    /* <>
+    </div> 
+
+    */
+    <>
       <Router>
         <Navbar />
         <Routes>
@@ -20,7 +24,7 @@ function App() {
           <Route path="/groceries" element={<Groceries />} />
         </Routes>
       </Router>
-    </> */
+    </>
   );
 }
 
