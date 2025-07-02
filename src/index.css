@@ -30,6 +30,12 @@ html {
         hover:cursor-pointer transition-all duration-200 ease-out;
     }
 
+    .recipe-menu-dropdown {
+        @apply hidden group-hover:flex columns-2 rounded-lg min-h-[80px] min-w-[120px]
+         bg-slate-700;
+    }
+
+
     .btn-primary {
         @apply px-4 rounded-lg bg-green-300/25 border-[1.5px]
          border-green-300/25 text-green-300/75 font-medium cursor-pointer

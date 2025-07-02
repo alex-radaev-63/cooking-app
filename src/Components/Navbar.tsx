@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { FaChevronDown } from "react-icons/fa6";
 
 const Navbar = () => {
   return (
@@ -13,10 +14,21 @@ const Navbar = () => {
 
       <div className="flex text-gray-300 h-full">
         <div className="main-nav-link">
-          <NavLink to="/">Home</NavLink>
+          <NavLink to="/">Overview</NavLink>
         </div>
-        <div className="main-nav-link">
-          <NavLink to="/recipes">Recipes</NavLink>
+        <div className="main-nav-link relative justify-center group">
+          <button
+            type="button"
+            className="flex items-center justify-center hover:cursor-pointer"
+          >
+            Recipes <FaChevronDown size={12} className="pt-0.5 ml-2" />
+          </button>
+          <div className="absolute top-full pt-2">
+            <div role="menu" className="recipe-menu-dropdown">
+              <div className="flex-col p-3">Meal&nbsp;Type</div>
+              <div className="flex-col p-3">Cuisines</div>
+            </div>
+          </div>
         </div>
         <div className="main-nav-link">
           <NavLink to="/groceries">Groceries</NavLink>
