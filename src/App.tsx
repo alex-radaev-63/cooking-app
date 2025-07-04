@@ -18,6 +18,7 @@ function App() {
     <>
       <Router>
         <Navbar />
+
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/recipes" element={<Recipes />} />

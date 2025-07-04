@@ -31,13 +31,13 @@ html {
     }
 
     .recipe-menu-dropdown {
-        @apply hidden group-hover:flex columns-2 rounded-lg min-h-[80px] min-w-[120px]
-         bg-slate-700;
+        @apply hidden p-5 gap-8 group-hover:flex rounded-lg 
+         bg-slate-800 border-slate-700 border-[1.5px];
     }
 
 
     .btn-primary {
-        @apply flex items-center h-full px-4 rounded-lg bg-green-300/25 border-[1.5px]
+        @apply flex items-center justify-center h-full px-4 rounded-lg bg-green-300/25 border-[1.5px]
          border-green-300/25 text-green-300/75 font-medium cursor-pointer
           hover:bg-green-300 hover:text-black transition-all duration-300 ease-out;
     }
