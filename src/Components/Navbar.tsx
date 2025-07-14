@@ -8,9 +8,11 @@ import AllMealsImg from "../assets/images/MealType-All-img.jfif";
 import breakfastImg from "../assets/images/MealType-Breakfast-img.jfif";
 import lunchImg from "../assets/images/MealType-Lunch-img.jfif";
 import dinnerImg from "../assets/images/MealType-Dinner-img.jfif";
+import LoginPopUp from "./Authentication/LoginPopUp";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [isLoginOpen, setLoginOpen] = useState(false);
   const cuisines = [
     "Italian",
     "Chinese",
@@ -84,7 +86,16 @@ const Navbar = () => {
           Groceries
         </NavLink>
       </nav>
-      <button className="btn-primary hidden sm:block">Log In</button>
+
+      <button
+        className="btn-primary hidden sm:block"
+        onClick={() => setLoginOpen(true)}
+      >
+        Log In
+      </button>
+
+      <LoginPopUp open={isLoginOpen} onClose={() => setLoginOpen(false)} />
+
       <button
         onClick={() => setOpen((o) => !o)}
         className="sm:hidden p-2 hover:cursor-pointer"
@@ -195,7 +206,7 @@ const Navbar = () => {
           <li className="mt-2">
             <button
               className="btn-primary w-full p-2.5"
-              onClick={() => setOpen(false)}
+              onClick={() => setLoginOpen(true)}
             >
               Log In
             </button>
