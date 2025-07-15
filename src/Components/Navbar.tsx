@@ -8,7 +8,7 @@ import AllMealsImg from "../assets/images/MealType-All-img.jfif";
 import breakfastImg from "../assets/images/MealType-Breakfast-img.jfif";
 import lunchImg from "../assets/images/MealType-Lunch-img.jfif";
 import dinnerImg from "../assets/images/MealType-Dinner-img.jfif";
-import LoginPopUp from "./Authentication/LoginPopUp";
+import LoginPopUp from "./authentication/LoginPopUp";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);

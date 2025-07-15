@@ -1,24 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { z, ZodError } from "zod";
+import { ZodError } from "zod";
+import { useOutsidePopUpClose } from "../../hooks/useOutsidePopUpClose";
+import { loginSchema } from "../../utils/LoginValidation";
 
 interface LoginPopUpProps {
   open: boolean;
   onClose: () => void;
 }
-
-const schema = z.object({
-  login: z
-    .string()
-    .min(1, "Please enter your login")
-    .email("Please enter a valid email"),
-  password: z
-    .string()
-    .min(1, "Please enter your password")
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
-});
 
 const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
   const [login, setLogin] = useState("");
@@ -30,6 +19,13 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
     auth?: string;
   }>({});
 
+  const loginRef = useRef<HTMLDivElement | null>(null);
+  useOutsidePopUpClose(
+    loginRef as React.RefObject<HTMLDivElement>,
+    onClose,
+    open
+  );
+
   useEffect(() => {
     if (!open) {
       setLogin("");
@@ -38,46 +34,12 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
     }
   }, [open]);
 
-  const loginRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (loginRef.current && !loginRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [open, onClose]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-
-    if (open) {
-      window.addEventListener("keydown", handleKeyDown);
-    }
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open, onClose]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      schema.parse({ login, password });
-      setErrors({}); // Clear previous
+      loginSchema.parse({ login, password });
+      setErrors({});
 
-      // Fake login check
       if (login !== "test@example.com" || password !== "Test1234") {
         setErrors({ auth: "Please enter correct login information" });
         return;
@@ -102,65 +64,57 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed px-4 inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div
         ref={loginRef}
         className="relative w-full max-w-sm rounded-xl bg-slate-800 p-6 text-white shadow-xl"
       >
-        {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white text-2xl font-bold hover:text-white hover:cursor-pointer"
+          className="absolute top-1 right-3 text-gray-500 text-3xl font-regular
+           hover:cursor-pointer hover:text-gray-400"
           aria-label="Close login popup"
         >
           ×
         </button>
 
-        <h2 className="mb-6 text-2xl font-semibold text-center text-green-300">
-          Log In
+        <h2 className="mb-8 text-2xl scale-y-115 font-gluten font-medium text-green-300">
+          Welcome to Yummm
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Login Field */}
           <div>
-            <label className="block mb-1 text-sm">Login</label>
+            <label className="label-input">Login</label>
             <input
               type="text"
               placeholder="you@example.com"
               value={login}
               onChange={(e) => setLogin(e.target.value)}
-              className={`w-full rounded-md bg-slate-700 px-3 py-2 text-sm outline-none ${
-                errors.login
-                  ? "ring-2 ring-red-400"
-                  : "focus:ring-2 focus:ring-green-400"
+              className={`input-default ${
+                errors.login ? "input-error" : "input-focus"
               }`}
-              required
             />
             {errors.login && (
               <p className="mt-1 text-sm text-red-400">{errors.login}</p>
             )}
           </div>
 
-          {/* Password Field */}
           <div>
-            <label className="block mb-1 text-sm">Password</label>
+            <label className="label-input">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full rounded-md bg-slate-700 px-3 py-2 text-sm pr-10 outline-none ${
-                  errors.password
-                    ? "ring-2 ring-red-400"
-                    : "focus:ring-2 focus:ring-green-400"
+                className={`input-default ${
+                  errors.password ? "input-error" : "input-focus"
                 }`}
-                required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-2.5 text-gray-400 hover:text-white"
+                className="absolute right-4 top-4 text-gray-400 hover:text-white hover:cursor-pointer"
                 aria-label="Toggle password visibility"
               >
                 {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
@@ -171,12 +125,17 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
             )}
           </div>
 
-          {/* Auth error */}
           {errors.auth && <p className="text-sm text-red-400">{errors.auth}</p>}
 
-          <button type="submit" className="btn-primary w-full">
-            Log In
-          </button>
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              disabled={!login || !password}
+              className="mt-8 btn-primary px-6 min-h-12"
+            >
+              Log In
+            </button>
+          </div>
         </form>
       </div>
     </div>

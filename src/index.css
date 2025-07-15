@@ -39,10 +39,28 @@ html {
     .btn-primary {
         @apply flex items-center justify-center h-full px-4 rounded-lg bg-green-300/25 border-[1.5px]
          border-green-300/25 text-green-300/75 font-medium cursor-pointer
-          hover:bg-green-300 hover:text-black transition-all duration-300 ease-out;
+          hover:bg-green-300 hover:text-black transition-all duration-300 ease-out disabled:bg-slate-700 
+          disabled:border-0 disabled:text-gray-500 disabled:cursor-default;
     }
 
     h1 {
         @apply text-white/15 text-2xl;
     }
+
+    .label-input {
+        @apply block mb-2 sm:text-sm;
+    }
+
+    .input-default {
+        @apply w-full min-h-12 rounded-md bg-slate-700 px-4 py-2 sm:text-sm outline-none;
+    }
+
+    .input-focus {
+        @apply focus:ring-2 focus:ring-green-400;
+    }
+
+    .input-error {
+        @apply ring-2 ring-red-400;
+    }
+
 }
