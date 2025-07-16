@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { ZodError } from "zod";
 import { useOutsidePopUpClose } from "../../hooks/useOutsidePopUpClose";
-import { loginSchema } from "../../utils/LoginValidation";
+import { loginSchema } from "../../utils/loginValidation";
 
 interface LoginPopUpProps {
   open: boolean;
@@ -19,12 +19,17 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
     auth?: string;
   }>({});
 
+  //Closing pop-up on click outside or "Esc"
+
   const loginRef = useRef<HTMLDivElement | null>(null);
+
   useOutsidePopUpClose(
     loginRef as React.RefObject<HTMLDivElement>,
     onClose,
     open
   );
+
+  //Cleaning input fields upon close
 
   useEffect(() => {
     if (!open) {
@@ -34,6 +39,8 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
     }
   }, [open]);
 
+  //Form submission handling
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -41,7 +48,7 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
       setErrors({});
 
       if (login !== "test@example.com" || password !== "Test1234") {
-        setErrors({ auth: "Please enter correct login information" });
+        setErrors({ auth: "Your login or password is incorrect" });
         return;
       }
 
@@ -130,7 +137,7 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
           <div className="flex justify-center">
             <button
               type="submit"
-              disabled={!login || !password}
+              disabled={!login.trim() || !password.trim()}
               className="mt-8 btn-primary px-6 min-h-12"
             >
               Log In
