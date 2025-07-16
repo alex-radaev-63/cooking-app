@@ -37,7 +37,7 @@ html {
 
 
     .btn-primary {
-        @apply flex items-center justify-center h-full px-4 rounded-lg bg-green-300/25 border-[1.5px]
+        @apply flex items-center justify-center h-full min-h-10 px-4 rounded-lg bg-green-300/25 border-[1.5px]
          border-green-300/25 text-green-300/75 font-medium cursor-pointer
           hover:bg-green-300 hover:text-black transition-all duration-300 ease-out disabled:bg-slate-700 
           disabled:border-0 disabled:text-gray-500 disabled:cursor-default;
