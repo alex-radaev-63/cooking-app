@@ -11,7 +11,7 @@ export interface GroceryListCardProps {
 
 export const groceryData: GroceryListCardProps[] = [
   {
-    week: "Week of Sept 22, 2024",
+    week: "Sunday, Sep 22, 2024",
     items: [
       { name: "2 lbs Chicken Breast", checked: false },
       { name: "1 gallon Milk", checked: true },
@@ -21,7 +21,7 @@ export const groceryData: GroceryListCardProps[] = [
     recipes: ["Chicken Alfredo", "Broccoli Cheddar Soup"],
   },
   {
-    week: "Week of Sept 15, 2024",
+    week: "Saturday, Sep 12, 2024",
     items: [
       { name: "1 lb Ground Beef", checked: true },
       { name: "Dozen Eggs", checked: true },
@@ -31,7 +31,7 @@ export const groceryData: GroceryListCardProps[] = [
     recipes: ["Tacos", "Avocado Toast"],
   },
   {
-    week: "Week of Sept 8, 2024",
+    week: "Friday, Sep 5, 2024",
     items: [
       { name: "1 Salmon Fillet", checked: false },
       { name: "Cheddar Cheese", checked: false },

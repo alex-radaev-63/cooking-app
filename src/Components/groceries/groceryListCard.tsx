@@ -21,33 +21,16 @@ const GroceryListCard = ({ week, items, recipes }: GroceryListCardProps) => {
         />
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-4 text-xs text-slate-300">
-        {["All", "Veggies", "Meat", "Dairy", "Snacks", "Drinks", "Other"].map(
-          (tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-slate-600 px-2 py-0.5"
-            >
-              {tag}
-            </span>
-          )
-        )}
-      </div>
-
-      <div className="space-y-2">
+      <div className="flex flex-col">
         {items.map(({ name }) => (
-          <label key={name} className="flex items-center gap-2">
+          <label key={name} className="flex items-center gap-2 min-h-10">
             <input
               type="checkbox"
               checked={checkedItems[name]}
               onChange={() => toggleItem(name)}
-              className="accent-green-500"
+              className="accent-green-500 min-h-5 min-w-5"
             />
-            <span
-              className={
-                checkedItems[name] ? "line-through text-slate-400" : ""
-              }
-            >
+            <span className={checkedItems[name] ? " text-slate-400" : ""}>
               {name}
             </span>
           </label>
