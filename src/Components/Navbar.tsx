@@ -1,32 +1,27 @@
 import { NavLink } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa6";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
-import RecipesMealTypes from "./RecipesMealTypes";
 
-import AllMealsImg from "../assets/images/MealType-All-img.jfif";
-import breakfastImg from "../assets/images/MealType-Breakfast-img.jfif";
-import lunchImg from "../assets/images/MealType-Lunch-img.jfif";
-import dinnerImg from "../assets/images/MealType-Dinner-img.jfif";
 import LoginPopUp from "./authentication/LoginPopUp";
+import RecipesDropdownMenu from "./recipesDropdownMenu";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isLoginOpen, setLoginOpen] = useState(false);
-  const cuisines = [
-    "Italian",
-    "Chinese",
-    "Indian",
-    "Mexican",
-    "Japanese",
-    "French",
-    "Thai",
-    "American",
-    "Spanish",
-    "Greek",
-    "Russian",
-    "Jamaican",
-  ];
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (!open) {
+      timeout = setTimeout(() => {
+        setIsDetailsOpen(false);
+      }, 350);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [open]);
 
   return (
     <header className="flex justify-between items-center h-[60px] p-2 pl-4 m-2 border-0 rounded-xl border-slate-700 bg-slate-800">
@@ -51,34 +46,8 @@ const Navbar = () => {
             </button>
           </NavLink>
 
-          <div className="absolute top-full pt-2">
-            <div role="menu" className="recipe-menu-dropdown">
-              <div className="flex flex-col min-w-[160px]">
-                <h4 className="font-bold mb-2">Meal&nbsp;Type</h4>
-                <RecipesMealTypes ImageURL={AllMealsImg} MealType="All" />
-                <RecipesMealTypes
-                  ImageURL={breakfastImg}
-                  MealType="Breakfast"
-                />
-                <RecipesMealTypes ImageURL={lunchImg} MealType="Lunch" />
-                <RecipesMealTypes ImageURL={dinnerImg} MealType="Dinner" />
-              </div>
-
-              <div className="flex flex-col min-w-[300px]">
-                <h4 className="font-bold mb-2">Cuisines</h4>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 pt-2">
-                  {cuisines.map((cuisine) => (
-                    <a
-                      href={`/recipes/${cuisine}`}
-                      key={cuisine}
-                      className="py-1 px-2 rounded-lg hover:bg-slate-700 text-gray-200 hover:text-white transition-all duration-250ms ease-out"
-                    >
-                      {cuisine}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div className="absolute top-full">
+            <RecipesDropdownMenu />
           </div>
         </div>
 
@@ -118,78 +87,37 @@ const Navbar = () => {
                 open ? "max-h-full" : "max-h-0 border-0 duration-350 ease-out"
               }`}
       >
-        <ul className="flex flex-col gap-1 px-4 py-3">
+        <ul className="flex flex-col gap-1 px-2 py-3 text-lg">
           <li>
             <NavLink
               onClick={() => setOpen(false)}
               to="/"
-              className="block py-4"
+              className="block px-4 py-4"
             >
               Overview
             </NavLink>
           </li>
 
           <li>
-            <details className="group">
-              <summary className="flex w-full items-center justify-between py-4 hover:cursor-pointer">
+            <details
+              className="group"
+              open={isDetailsOpen}
+              onToggle={(e) => setIsDetailsOpen(e.currentTarget.open)}
+            >
+              <summary
+                className="flex w-full items-center justify-between px-4 py-4 rounded-lg 
+              hover:cursor-pointer group-open:bg-slate-700"
+              >
                 Recipes
                 <FaChevronDown
                   size={14}
-                  className="transition-transform group-open:rotate-180"
+                  className={`transition-transform ${
+                    isDetailsOpen ? "rotate-180" : ""
+                  }`}
                 />
               </summary>
 
-              <div className="mt-1 space-y-3 pl-4 text-sm">
-                <div>
-                  <h4 className="font-bold mb-1">Meal Type</h4>
-                  <NavLink
-                    to="/recipes/breakfast"
-                    className="block py-1"
-                    onClick={() => setOpen(false)}
-                  >
-                    Breakfast
-                  </NavLink>
-                  <NavLink
-                    to="/recipes/lunch"
-                    className="block py-1"
-                    onClick={() => setOpen(false)}
-                  >
-                    Lunch
-                  </NavLink>
-                  <NavLink
-                    to="/recipes/dinner"
-                    className="block py-1"
-                    onClick={() => setOpen(false)}
-                  >
-                    Dinner
-                  </NavLink>
-                </div>
-
-                <div>
-                  <h4 className="font-bold mb-1">Cuisines</h4>
-                  <NavLink
-                    to="/recipes/italian"
-                    className="block py-1"
-                    onClick={() => setOpen(false)}
-                  >
-                    Italian
-                  </NavLink>
-                  <NavLink
-                    to="/recipes/japanese"
-                    className="block py-1"
-                    onClick={() => setOpen(false)}
-                  >
-                    Japanese
-                  </NavLink>
-                  <NavLink
-                    to="/recipes/canadian"
-                    className="block py-1"
-                    onClick={() => setOpen(false)}
-                  >
-                    Canadian
-                  </NavLink>
-                </div>
-              </div>
+              <RecipesDropdownMenu />
             </details>
           </li>
 
@@ -197,13 +125,13 @@ const Navbar = () => {
             <NavLink
               onClick={() => setOpen(false)}
               to="/groceries"
-              className="block py-4"
+              className="block px-4 py-4"
             >
               Groceries
             </NavLink>
           </li>
 
-          <li className="mt-2">
+          <li className="mt-2 px-4 pb-1">
             <button
               className="btn-primary w-full p-2.5"
               onClick={() => setLoginOpen(true)}

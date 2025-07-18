@@ -31,7 +31,7 @@ export const groceryData: GroceryListCardProps[] = [
     recipes: ["Tacos", "Avocado Toast"],
   },
   {
-    week: "Friday, Sep 5, 2024",
+    week: "Fri, Sep 5, 2024",
     items: [
       { name: "1 Salmon Fillet", checked: false },
       { name: "Cheddar Cheese", checked: false },

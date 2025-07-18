@@ -31,8 +31,9 @@ html {
     }
 
     .recipe-menu-dropdown {
-        @apply hidden p-5 gap-8 group-hover:flex rounded-lg 
-         bg-slate-800 border-slate-700 border-[1.5px];
+        @apply flex flex-col sm:p-5 gap-5 sm:gap-8 sm:hidden sm:group-hover:flex 
+        sm:group-hover:flex-row rounded-lg 
+        sm:bg-slate-800 sm:border-slate-700 sm:border-[1.5px];
     }
 
 
