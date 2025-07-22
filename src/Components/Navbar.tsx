@@ -3,7 +3,7 @@ import { FaChevronDown } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
 
-import LoginPopUp from "./authentication/LoginPopUp";
+import LoginPopUp from "./Authentication/LoginPopUp";
 import RecipesDropdownMenu from "./RecipesDropdownMenu";
 
 const Navbar = () => {
