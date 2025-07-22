@@ -3,10 +3,10 @@ import { groceryData as originalData } from "../../data/groceryData";
 import type { GroceryListProps } from "../../data/groceryData";
 import { produce } from "immer";
 
-type GroceryContextType = {
+interface GroceryContextType {
   groceryLists: GroceryListProps[];
   toggleItemChecked: (listIndex: number, itemId: number) => void;
-};
+}
 
 const GroceryContext = createContext<GroceryContextType | undefined>(undefined);
 

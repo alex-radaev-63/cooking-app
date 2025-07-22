@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
 
 import LoginPopUp from "./authentication/LoginPopUp";
-import RecipesDropdownMenu from "./recipesDropdownMenu";
+import RecipesDropdownMenu from "./RecipesDropdownMenu";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isRecipesOpen, setIsRecipesOpen] = useState(false);
   const [isLoginOpen, setLoginOpen] = useState(false);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const Navbar = () => {
 
     if (!open) {
       timeout = setTimeout(() => {
-        setIsDetailsOpen(false);
+        setIsRecipesOpen(false);
       }, 350);
     }
 
@@ -46,7 +46,16 @@ const Navbar = () => {
             </button>
           </NavLink>
 
-          <div className="absolute top-full">
+          <div
+            className="
+   absolute top-full 
+    opacity-0 translate-y-4
+    group-hover:opacity-100 group-hover:translate-y-0
+    pointer-events-none group-hover:pointer-events-auto
+    transition-all duration-300 ease-in-out
+    z-10
+    "
+          >
             <RecipesDropdownMenu />
           </div>
         </div>
@@ -99,26 +108,31 @@ const Navbar = () => {
           </li>
 
           <li>
-            <details
-              className="group"
-              open={isDetailsOpen}
-              onToggle={(e) => setIsDetailsOpen(e.currentTarget.open)}
+            <button
+              onClick={() => setIsRecipesOpen((o) => !o)}
+              className={`flex w-full items-center justify-between px-4 py-4 rounded-lg 
+                hover:cursor-pointer hover:bg-slate-700 transition-colors ${
+                  isRecipesOpen ? "bg-slate-700" : "bg-slate-800"
+                }`}
             >
-              <summary
-                className="flex w-full items-center justify-between px-4 py-4 rounded-lg 
-              hover:cursor-pointer group-open:bg-slate-700"
-              >
-                Recipes
-                <FaChevronDown
-                  size={14}
-                  className={`transition-transform ${
-                    isDetailsOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </summary>
+              Recipes
+              <FaChevronDown
+                size={14}
+                className={`transition-transform duration-200 ${
+                  isRecipesOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
+            <div
+              className={`transition-all duration-350 ease-out overflow-hidden ${
+                isRecipesOpen
+                  ? "max-h-[500px] opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
+            >
               <RecipesDropdownMenu />
-            </details>
+            </div>
           </li>
 
           <li>

@@ -6,14 +6,14 @@ import { TbMeat } from "react-icons/tb";
 import GroceryItem from "./GroceryItem";
 import type { GroceryItem as GroceryItemType } from "../../data/groceryData";
 
-type Props = {
+interface Props {
   date: string;
   items: GroceryItemType[];
   recipes: string[];
   index: number;
-};
+}
 
-function GroceryList({ date, items, recipes, index }: Props) {
+const GroceryList = ({ date, items, recipes, index }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -79,6 +79,6 @@ function GroceryList({ date, items, recipes, index }: Props) {
       </div>
     </div>
   );
-}
+};
 
 export default GroceryList;

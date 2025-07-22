@@ -22,7 +22,7 @@ const RecipesDropdownMenu = () => {
   ];
 
   return (
-    <div role="menu" className="recipe-menu-dropdown pl-4 mt-3">
+    <div role="menu" className="recipe-menu-dropdown mt-3 pl-4">
       <div className="flex flex-col min-w-[160px]">
         <h4 className="font-bold mb-3 text-sm">Meal&nbsp;Types</h4>
         <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:flex sm:flex-col">

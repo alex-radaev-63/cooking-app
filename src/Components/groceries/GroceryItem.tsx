@@ -1,12 +1,12 @@
 import type { GroceryItem as GroceryItemType } from "../../data/groceryData";
 import { useGroceryContext } from "../context/GroceryContext";
 
-type Props = {
+interface Props {
   item: GroceryItemType;
   listIndex: number;
-};
+}
 
-function GroceryItem({ item, listIndex }: Props) {
+const GroceryItem = ({ item, listIndex }: Props) => {
   const { toggleItemChecked } = useGroceryContext();
 
   return (
@@ -20,6 +20,6 @@ function GroceryItem({ item, listIndex }: Props) {
       <span className={item.checked ? "text-slate-500" : ""}>{item.name}</span>
     </label>
   );
-}
+};
 
 export default GroceryItem;
