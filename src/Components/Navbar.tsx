@@ -47,14 +47,9 @@ const Navbar = () => {
           </NavLink>
 
           <div
-            className="
-   absolute top-full 
-    opacity-0 translate-y-4
-    group-hover:opacity-100 group-hover:translate-y-0
-    pointer-events-none group-hover:pointer-events-auto
-    transition-all duration-300 ease-in-out
-    z-10
-    "
+            className="absolute top-full opacity-0 translate-y-4 group-hover:opacity-100 
+            group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto
+            transition-all duration-350 ease-in-out z-10"
           >
             <RecipesDropdownMenu />
           </div>

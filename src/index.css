@@ -32,8 +32,7 @@ html {
 
     .recipe-menu-dropdown {
         @apply flex flex-col sm:flex sm:flex-row sm:p-5 gap-5 sm:gap-8
-         rounded-lg 
-        sm:bg-slate-800 sm:border-slate-700 sm:border-[1.5px];
+         rounded-lg sm:bg-slate-800 sm:border-slate-700 sm:border-[1.5px];
     }
 
 
