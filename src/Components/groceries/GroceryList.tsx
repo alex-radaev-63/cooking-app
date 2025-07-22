@@ -3,10 +3,17 @@ import { FaPencil } from "react-icons/fa6";
 import { LuCookingPot } from "react-icons/lu";
 import { TbMeat } from "react-icons/tb";
 
-import type { GroceryListProps } from "../../data/groceryData";
 import GroceryItem from "./GroceryItem";
+import type { GroceryItem as GroceryItemType } from "../../data/groceryData";
 
-const GroceryList: React.FC<GroceryListProps> = ({ date, items, recipes }) => {
+type Props = {
+  date: string;
+  items: GroceryItemType[];
+  recipes: string[];
+  index: number;
+};
+
+function GroceryList({ date, items, recipes, index }: Props) {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -38,7 +45,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ date, items, recipes }) => {
           </div>
           <ul className="flex flex-col">
             {items.map((item) => (
-              <GroceryItem key={item.id} {...item} />
+              <GroceryItem key={item.id} item={item} listIndex={index} />
             ))}
           </ul>
         </div>
@@ -72,6 +79,6 @@ const GroceryList: React.FC<GroceryListProps> = ({ date, items, recipes }) => {
       </div>
     </div>
   );
-};
+}
 
 export default GroceryList;

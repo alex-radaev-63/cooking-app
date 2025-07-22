@@ -1,11 +1,13 @@
+import { useGroceryContext } from "../context/GroceryContext";
 import GroceryList from "./GroceryList";
-import { groceryData } from "../../data/groceryData";
 
 const GroceryFeed = () => {
+  const { groceryLists } = useGroceryContext();
+
   return (
     <div className="flex flex-col gap-4">
-      {groceryData.map((list, listIndex) => (
-        <GroceryList key={listIndex} {...list} />
+      {groceryLists.map((list, listIndex) => (
+        <GroceryList key={listIndex} index={listIndex} {...list} />
       ))}
     </div>
   );

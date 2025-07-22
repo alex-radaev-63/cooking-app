@@ -1,5 +1,6 @@
 //import { FaChevronDown, FaPlus } from "react-icons/fa6";
 
+import { GroceryProvider } from "../Components/context/GroceryContext";
 import GroceryFeed from "../Components/groceries/GroceryFeed";
 
 const Groceries = () => {
@@ -7,9 +8,9 @@ const Groceries = () => {
     <div className="flex flex-col max-w-[600px] mx-auto p-2 mt-8 gap-4">
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-medium text-white">Groceries</h1>
-
-        <GroceryFeed />
-
+        <GroceryProvider>
+          <GroceryFeed />
+        </GroceryProvider>
         {/*
         <div className="flex justify-between w-full gap-3">
 
