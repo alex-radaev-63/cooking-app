@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { LuCookingPot } from "react-icons/lu";
 import { TbMeat } from "react-icons/tb";
 
 import GroceryItem from "./GroceryItem";
 import type { GroceryItem as GroceryItemType } from "../../data/groceryData";
+import { useGroceryContext } from "../context/GroceryContext";
 
 interface Props {
   date: string;
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const GroceryList = ({ date, items, recipes, index }: Props) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const { isEditingList, setIsEditingList } = useGroceryContext();
 
   return (
     <div className="flex flex-col gap-3">
@@ -23,12 +23,12 @@ const GroceryList = ({ date, items, recipes, index }: Props) => {
 
         <div className="flex flex-row min-h-[40px] justify-between items-center">
           <h3 className="text-xl font-medium">{date}</h3>
-          {!isEditing && (
+          {!isEditingList[index] && (
             <button
               onClick={() => {
-                setIsEditing(!isEditing);
+                setIsEditingList(index, true);
               }}
-              className="flex py-2 px-4 items-center rounded-lg hover:bg-slate-700 hover:cursor-pointer"
+              className="flex py-2 px-4 text-gray-400 items-center rounded-lg hover:bg-slate-700 hover:cursor-pointer hover:text-white"
             >
               <FaPencil size="12px" className="mr-2" />
               Edit
@@ -43,7 +43,7 @@ const GroceryList = ({ date, items, recipes, index }: Props) => {
             <TbMeat size={16} className="text-gray-400 mt-0.5" />
             <h4 className="text-gray-400">Item's list</h4>
           </div>
-          <ul className="flex flex-col">
+          <ul className="flex flex-col gap-3">
             {items.map((item) => (
               <GroceryItem key={item.id} item={item} listIndex={index} />
             ))}
@@ -65,10 +65,10 @@ const GroceryList = ({ date, items, recipes, index }: Props) => {
             </ul>
           </div>
 
-          {isEditing && (
+          {isEditingList[index] && (
             <button
               onClick={() => {
-                setIsEditing(!isEditing);
+                setIsEditingList(index, false);
               }}
               className="btn-primary"
             >

@@ -6,12 +6,17 @@ import { produce } from "immer";
 interface GroceryContextType {
   groceryLists: GroceryListProps[];
   toggleItemChecked: (listIndex: number, itemId: number) => void;
+  isEditingList: { [index: number]: boolean };
+  setIsEditingList: (index: number, value: boolean) => void;
 }
 
 const GroceryContext = createContext<GroceryContextType | undefined>(undefined);
 
 export const GroceryProvider = ({ children }: { children: ReactNode }) => {
   const [groceryLists, setGroceryLists] = useState(originalData);
+  const [isEditingList, setIsEditingListState] = useState<{
+    [index: number]: boolean;
+  }>(Object.fromEntries(originalData.map((_, index) => [index, false])));
 
   const toggleItemChecked = (listIndex: number, itemId: number) => {
     setGroceryLists((prev) =>
@@ -22,8 +27,22 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const setIsEditingList = (index: number, value: boolean) => {
+    setIsEditingListState((prev) => ({
+      ...prev,
+      [index]: value,
+    }));
+  };
+
   return (
-    <GroceryContext.Provider value={{ groceryLists, toggleItemChecked }}>
+    <GroceryContext.Provider
+      value={{
+        groceryLists,
+        toggleItemChecked,
+        isEditingList,
+        setIsEditingList,
+      }}
+    >
       {children}
     </GroceryContext.Provider>
   );
