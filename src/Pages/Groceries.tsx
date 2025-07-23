@@ -5,7 +5,7 @@ import GroceryFeed from "../Components/groceries/GroceryFeed";
 
 const Groceries = () => {
   return (
-    <div className="flex flex-col max-w-[600px] mx-auto p-2 mt-8 gap-4">
+    <div className="flex flex-col max-w-[600px] mx-auto p-2 mt-6 gap-4">
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-medium text-white">Groceries</h1>
         <GroceryProvider>

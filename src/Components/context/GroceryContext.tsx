@@ -28,10 +28,18 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const setIsEditingList = (index: number, value: boolean) => {
-    setIsEditingListState((prev) => ({
-      ...prev,
-      [index]: value,
-    }));
+    if (value) {
+      // Turn on editing for one list, disable all others
+      setIsEditingListState(
+        Object.fromEntries(originalData.map((_, i) => [i, i === index]))
+      );
+    } else {
+      // Just turn off editing for the specified list
+      setIsEditingListState((prev) => ({
+        ...prev,
+        [index]: false,
+      }));
+    }
   };
 
   return (

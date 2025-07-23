@@ -122,7 +122,7 @@ const Navbar = () => {
             <div
               className={`transition-all duration-350 ease-out overflow-hidden ${
                 isRecipesOpen
-                  ? "max-h-[500px] opacity-100"
+                  ? "max-h-[720px] opacity-100"
                   : "max-h-0 opacity-0"
               }`}
             >

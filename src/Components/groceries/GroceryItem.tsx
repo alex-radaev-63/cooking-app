@@ -1,6 +1,8 @@
 import type { GroceryItem as GroceryItemType } from "../../data/groceryData";
 import { useGroceryContext } from "../context/GroceryContext";
 
+import { IoClose } from "react-icons/io5";
+
 interface Props {
   item: GroceryItemType;
   listIndex: number;
@@ -24,11 +26,17 @@ const GroceryItem = ({ item, listIndex }: Props) => {
           </span>
         </div>
       ) : (
-        <input
-          type="text"
-          defaultValue={item.name}
-          className="min-h-[40px] bg-slate-700 text-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-400 focus:text-white"
-        />
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Grocery Item"
+            defaultValue={item.name}
+            className="min-h-[40px] w-full bg-slate-700 text-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-400 focus:text-white"
+          />
+          <button className="absolute right-2 top-2 text-gray-400 hover:text-white hover:cursor-pointer">
+            <IoClose size={24} />
+          </button>
+        </div>
       )}
     </>
   );
