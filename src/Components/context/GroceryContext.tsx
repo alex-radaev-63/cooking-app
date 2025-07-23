@@ -8,6 +8,7 @@ interface GroceryContextType {
   toggleItemChecked: (listIndex: number, itemId: number) => void;
   isEditingList: { [index: number]: boolean };
   setIsEditingList: (index: number, value: boolean) => void;
+  updateItemName: (listIndex: number, itemId: number, newName: string) => void;
 }
 
 const GroceryContext = createContext<GroceryContextType | undefined>(undefined);
@@ -23,6 +24,19 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
       produce(prev, (draft) => {
         const item = draft[listIndex]?.items.find((i) => i.id === itemId);
         if (item) item.checked = !item.checked;
+      })
+    );
+  };
+
+  const updateItemName = (
+    listIndex: number,
+    itemId: number,
+    newName: string
+  ) => {
+    setGroceryLists((prev) =>
+      produce(prev, (draft) => {
+        const item = draft[listIndex]?.items.find((i) => i.id === itemId);
+        if (item) item.name = newName;
       })
     );
   };
@@ -49,6 +63,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
         toggleItemChecked,
         isEditingList,
         setIsEditingList,
+        updateItemName,
       }}
     >
       {children}

@@ -5,6 +5,7 @@ import { TbMeat } from "react-icons/tb";
 import GroceryItem from "./GroceryItem";
 import type { GroceryItem as GroceryItemType } from "../../data/groceryData";
 import { useGroceryContext } from "../context/GroceryContext";
+import { useRef } from "react";
 
 interface Props {
   date: string;
@@ -14,7 +15,20 @@ interface Props {
 }
 
 const GroceryList = ({ date, items, recipes, index }: Props) => {
-  const { isEditingList, setIsEditingList } = useGroceryContext();
+  const { isEditingList, setIsEditingList, updateItemName } =
+    useGroceryContext();
+
+  const nameRefs = useRef<{ [id: number]: string }>({});
+
+  const handleSave = () => {
+    for (const item of items) {
+      const newName = nameRefs.current[item.id];
+      if (newName !== undefined && newName !== item.name) {
+        updateItemName(index, item.id, newName);
+      }
+    }
+    setIsEditingList(index, false);
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -45,7 +59,15 @@ const GroceryList = ({ date, items, recipes, index }: Props) => {
           </div>
           <ul className="flex flex-col gap-3">
             {items.map((item) => (
-              <GroceryItem key={item.id} item={item} listIndex={index} />
+              <GroceryItem
+                key={item.id}
+                item={item}
+                listIndex={index}
+                {...(isEditingList[index] && {
+                  onValueChange: (value: string) =>
+                    (nameRefs.current[item.id] = value),
+                })}
+              />
             ))}
           </ul>
         </div>
@@ -66,12 +88,7 @@ const GroceryList = ({ date, items, recipes, index }: Props) => {
           </div>
 
           {isEditingList[index] && (
-            <button
-              onClick={() => {
-                setIsEditingList(index, false);
-              }}
-              className="btn-primary"
-            >
+            <button onClick={handleSave} className="btn-primary">
               Save Edits
             </button>
           )}
