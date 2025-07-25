@@ -5,7 +5,6 @@ import { TbMeat } from "react-icons/tb";
 import GroceryItem from "./GroceryItem";
 import type { GroceryItem as GroceryItemType } from "../../data/groceryData";
 import { useGroceryContext } from "../context/GroceryContext";
-import { useRef } from "react";
 
 interface Props {
   date: string;
@@ -15,20 +14,8 @@ interface Props {
 }
 
 const GroceryList = ({ date, items, recipes, index }: Props) => {
-  const { isEditingList, setIsEditingList, updateItemName } =
+  const { isEditingList, setIsEditingList, addItemToList } =
     useGroceryContext();
-
-  const nameRefs = useRef<{ [id: number]: string }>({});
-
-  const handleSave = () => {
-    for (const item of items) {
-      const newName = nameRefs.current[item.id];
-      if (newName !== undefined && newName !== item.name) {
-        updateItemName(index, item.id, newName);
-      }
-    }
-    setIsEditingList(index, false);
-  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -55,20 +42,33 @@ const GroceryList = ({ date, items, recipes, index }: Props) => {
         <div className="flex flex-col mt-4 mb-6 gap-3">
           <div className="flex flex-row gap-2 items-center">
             <TbMeat size={16} className="text-gray-400 mt-0.5" />
-            <h4 className="text-gray-400">Item's list</h4>
+            <h4 className="text-gray-400">
+              {items.length != 0 ? "Items list" : "No grocery items to show"}
+            </h4>
           </div>
+
           <ul className="flex flex-col gap-3">
             {items.map((item) => (
-              <GroceryItem
-                key={item.id}
-                item={item}
-                listIndex={index}
-                {...(isEditingList[index] && {
-                  onValueChange: (value: string) =>
-                    (nameRefs.current[item.id] = value),
-                })}
-              />
+              <GroceryItem key={item.id} item={item} listIndex={index} />
             ))}
+            {isEditingList[index] || items.length === 0 ? (
+              <button
+                onClick={() => {
+                  if (isEditingList[index]) {
+                    addItemToList(index);
+                  } else if (items.length === 0) {
+                    setIsEditingList(index, true);
+                    addItemToList(index);
+                  }
+                }}
+                className={`mt-2 ${
+                  items.length === 0 ? "min-h-[64px]" : "min-h-[48px]"
+                } text-gray-400 rounded border-2 border-dashed
+                 border-slate-700 hover:border-slate-600 hover:text-white`}
+              >
+                + Add Item
+              </button>
+            ) : null}
           </ul>
         </div>
 
@@ -88,7 +88,10 @@ const GroceryList = ({ date, items, recipes, index }: Props) => {
           </div>
 
           {isEditingList[index] && (
-            <button onClick={handleSave} className="btn-primary">
+            <button
+              onClick={() => setIsEditingList(index, false)}
+              className="btn-primary"
+            >
               Save Edits
             </button>
           )}

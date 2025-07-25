@@ -88,7 +88,7 @@ const Navbar = () => {
               mx-2 overflow-hidden rounded-xl border border-slate-700 bg-slate-800
               text-gray-300 transition-[max-height] duration-350 ease-in
               sm:hidden ${
-                open ? "max-h-full" : "max-h-0 border-0 duration-350 ease-out"
+                open ? "max-h-screen" : "max-h-0 border-0 duration-350 ease-out"
               }`}
       >
         <ul className="flex flex-col gap-1 px-2 py-3 text-lg">

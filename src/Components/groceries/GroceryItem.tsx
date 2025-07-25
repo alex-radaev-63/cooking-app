@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { GroceryItem as GroceryItemType } from "../../data/groceryData";
 import { useGroceryContext } from "../context/GroceryContext";
 
@@ -10,11 +9,15 @@ interface Props {
 }
 
 const GroceryItem = ({ item, listIndex }: Props) => {
-  const { toggleItemChecked, isEditingList } = useGroceryContext();
-  const [name, setName] = useState(item.name);
+  const {
+    toggleItemChecked,
+    isEditingList,
+    removeItemFromList,
+    updateItemName,
+  } = useGroceryContext();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
+    updateItemName(listIndex, item.id, e.target.value);
   };
 
   return (
@@ -27,18 +30,23 @@ const GroceryItem = ({ item, listIndex }: Props) => {
             onChange={() => toggleItemChecked(listIndex, item.id)}
             className="accent-green-300 min-h-5 min-w-5"
           />
-          <span className={item.checked ? "text-slate-500" : ""}>{name}</span>
+          <span className={item.checked ? "text-slate-500" : ""}>
+            {item.name}
+          </span>
         </label>
       ) : (
         <div className="relative">
           <input
             type="text"
             placeholder="Grocery Item"
-            value={name}
+            value={item.name}
             onChange={handleChange}
             className="min-h-[40px] w-full bg-slate-700 text-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-400 focus:text-white"
           />
-          <button className="absolute right-2 top-2 text-gray-400 hover:text-white hover:cursor-pointer">
+          <button
+            onClick={() => removeItemFromList(listIndex, item.id)}
+            className="absolute right-2 top-2 text-gray-400 hover:text-white hover:cursor-pointer"
+          >
             <IoClose size={24} />
           </button>
         </div>
