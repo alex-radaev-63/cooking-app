@@ -5,10 +5,10 @@ import { IoClose } from "react-icons/io5";
 
 interface Props {
   item: GroceryItemType;
-  listIndex: number;
+  listId: string; // changed from listIndex:number to listId:string
 }
 
-const GroceryItem = ({ item, listIndex }: Props) => {
+const GroceryItem = ({ item, listId }: Props) => {
   const {
     toggleItemChecked,
     isEditingList,
@@ -17,17 +17,17 @@ const GroceryItem = ({ item, listIndex }: Props) => {
   } = useGroceryContext();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateItemName(listIndex, item.id, e.target.value);
+    updateItemName(listId, item.id, e.target.value);
   };
 
   return (
     <>
-      {!isEditingList[listIndex] ? (
+      {!isEditingList[listId] ? (
         <label className="flex flex-row gap-3 items-center min-h-[28px]">
           <input
             type="checkbox"
             checked={item.checked}
-            onChange={() => toggleItemChecked(listIndex, item.id)}
+            onChange={() => toggleItemChecked(listId, item.id)}
             className="accent-green-300 min-h-5 min-w-5"
           />
           <span className={item.checked ? "text-slate-500" : ""}>
@@ -44,7 +44,7 @@ const GroceryItem = ({ item, listIndex }: Props) => {
             className="min-h-[40px] w-full bg-slate-700 text-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-400 focus:text-white"
           />
           <button
-            onClick={() => removeItemFromList(listIndex, item.id)}
+            onClick={() => removeItemFromList(listId, item.id)}
             className="absolute right-2 top-2 text-gray-400 hover:text-white hover:cursor-pointer"
           >
             <IoClose size={24} />

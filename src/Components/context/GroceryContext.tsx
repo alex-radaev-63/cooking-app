@@ -1,52 +1,216 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import { groceryData as originalData } from "../../data/groceryData";
-import type { GroceryListProps } from "../../data/groceryData";
+import { format } from "date-fns";
+import {
+  useEffect,
+  useState,
+  createContext,
+  useContext,
+  type ReactNode,
+} from "react";
+import {
+  groceriesService,
+  type GroceryListProps,
+} from "../../services/groceriesManageDB";
 import { produce } from "immer";
 
 interface GroceryContextType {
   groceryLists: GroceryListProps[];
-  toggleItemChecked: (listIndex: number, itemId: number) => void;
-  isEditingList: { [index: number]: boolean };
-  setIsEditingList: (index: number, value: boolean) => void;
-  updateItemName: (listIndex: number, itemId: number, newName: string) => void;
-  addItemToList: (listIndex: number) => void;
-  removeItemFromList: (listIndex: number, itemId: number) => void;
+  toggleItemChecked: (listId: string, itemId: number) => Promise<void>;
+  isEditingList: { [id: string]: boolean };
+  setIsEditingList: (listId: string, value: boolean) => Promise<void>;
+  updateItemName: (
+    listId: string,
+    itemId: number,
+    newName: string
+  ) => Promise<void>;
+  addItemToList: (listId: string) => Promise<void>;
+  removeItemFromList: (listId: string, itemId: number) => Promise<void>;
+
+  isSavingList: { [id: string]: boolean };
+  setIsSavingList: (listId: string, value: boolean) => void;
+
+  saveErrors: { [id: string]: string | null };
+  setSaveErrors: (listId: string, error: string | null) => void;
+
+  createNewList: () => Promise<void>;
+  deleteList: (listId: string, confirm: boolean) => Promise<void>;
 }
 
 const GroceryContext = createContext<GroceryContextType | undefined>(undefined);
 
 export const GroceryProvider = ({ children }: { children: ReactNode }) => {
-  const [groceryLists, setGroceryLists] = useState(originalData);
+  const [groceryLists, setGroceryLists] = useState<GroceryListProps[]>([]);
   const [isEditingList, setIsEditingListState] = useState<{
-    [index: number]: boolean;
-  }>(Object.fromEntries(originalData.map((_, index) => [index, false])));
+    [id: string]: boolean;
+  }>({});
+  const [isSavingList, setIsSavingListState] = useState<{
+    [id: string]: boolean;
+  }>({});
+  const [saveErrors, setSaveErrorsState] = useState<{
+    [id: string]: string | null;
+  }>({});
 
-  const toggleItemChecked = (listIndex: number, itemId: number) => {
+  // Fetch lists once on mount
+  useEffect(() => {
+    async function fetchLists() {
+      try {
+        const lists = await groceriesService.getAllLists();
+        setGroceryLists(lists);
+
+        // Initialize per-list states by id
+        const editing = lists.reduce((acc, list) => {
+          if (list.id) acc[list.id] = false;
+          return acc;
+        }, {} as { [id: string]: boolean });
+        setIsEditingListState(editing);
+        setIsSavingListState(editing);
+        setSaveErrorsState(
+          lists.reduce((acc, list) => {
+            if (list.id) acc[list.id] = null;
+            return acc;
+          }, {} as { [id: string]: string | null })
+        );
+      } catch (error) {
+        console.error("Failed to load grocery lists", error);
+      }
+    }
+    fetchLists();
+  }, []);
+
+  // Setters for saving and errors by list id
+  const setIsSavingList = (listId: string, value: boolean) => {
+    setIsSavingListState((prev) => ({ ...prev, [listId]: value }));
+  };
+
+  const setSaveErrors = (listId: string, error: string | null) => {
+    setSaveErrorsState((prev) => ({ ...prev, [listId]: error }));
+  };
+
+  const createNewList = async () => {
+    const hasEmptyList = groceryLists.some(
+      (list) => list.items.length === 0 && list.recipes.length === 0
+    );
+
+    if (hasEmptyList) {
+      alert(
+        "You already have an empty list. Please fill or delete it before adding a new one."
+      );
+      return;
+    }
+
+    const formattedDate = format(new Date(), "MMMM d, yyyy");
+    const newList: Omit<GroceryListProps, "id" | "created_at"> = {
+      date: formattedDate,
+      items: [],
+      recipes: [],
+    };
+
+    try {
+      const createdList = await groceriesService.createList(newList);
+      setGroceryLists((prev) => [...prev, createdList]);
+
+      if (createdList.id) {
+        setIsEditingListState((prev) => ({
+          ...prev,
+          [createdList.id!]: false,
+        }));
+        setIsSavingListState((prev) => ({ ...prev, [createdList.id!]: false }));
+        setSaveErrorsState((prev) => ({ ...prev, [createdList.id!]: null }));
+      }
+    } catch (error) {
+      console.error("Failed to create new list", error);
+    }
+  };
+
+  const deleteList = async (listId: string, confirm: boolean) => {
+    if (!confirm) return;
+
+    try {
+      await groceriesService.deleteList(listId);
+
+      setGroceryLists((prev) => prev.filter((list) => list.id !== listId));
+
+      // Remove per-list states for this id
+      setIsEditingListState((prev) => {
+        const copy = { ...prev };
+        delete copy[listId];
+        return copy;
+      });
+
+      setIsSavingListState((prev) => {
+        const copy = { ...prev };
+        delete copy[listId];
+        return copy;
+      });
+
+      setSaveErrorsState((prev) => {
+        const copy = { ...prev };
+        delete copy[listId];
+        return copy;
+      });
+    } catch (error) {
+      console.error("Failed to delete list:", error);
+    }
+  };
+
+  // Helper to find list by id and index
+  const findListIndex = (listId: string) =>
+    groceryLists.findIndex((list) => list.id === listId);
+
+  const toggleItemChecked = async (listId: string, itemId: number) => {
+    const idx = findListIndex(listId);
+    if (idx === -1) return;
+
     setGroceryLists((prev) =>
       produce(prev, (draft) => {
-        const item = draft[listIndex]?.items.find((i) => i.id === itemId);
+        const item = draft[idx]?.items.find((i) => i.id === itemId);
         if (item) item.checked = !item.checked;
       })
     );
+
+    try {
+      await groceriesService.updateList(listId, {
+        date: groceryLists[idx].date,
+        items: groceryLists[idx].items,
+        recipes: groceryLists[idx].recipes,
+      });
+    } catch (error) {
+      console.error("Failed to update item checked", error);
+    }
   };
 
-  const updateItemName = (
-    listIndex: number,
+  const updateItemName = async (
+    listId: string,
     itemId: number,
     newName: string
   ) => {
+    const idx = findListIndex(listId);
+    if (idx === -1) return;
+
     setGroceryLists((prev) =>
       produce(prev, (draft) => {
-        const item = draft[listIndex]?.items.find((i) => i.id === itemId);
+        const item = draft[idx]?.items.find((i) => i.id === itemId);
         if (item) item.name = newName;
       })
     );
+
+    try {
+      await groceriesService.updateList(listId, {
+        date: groceryLists[idx].date,
+        items: groceryLists[idx].items,
+        recipes: groceryLists[idx].recipes,
+      });
+    } catch (error) {
+      console.error("Failed to update item name", error);
+    }
   };
 
-  const addItemToList = (listIndex: number) => {
+  const addItemToList = async (listId: string) => {
+    const idx = findListIndex(listId);
+    if (idx === -1) return;
+
     setGroceryLists((prev) =>
       produce(prev, (draft) => {
-        const currentItems = draft[listIndex].items;
+        const currentItems = draft[idx].items;
         const nextId =
           currentItems.length > 0
             ? Math.max(...currentItems.map((item) => item.id)) + 1
@@ -59,19 +223,42 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
         });
       })
     );
+
+    try {
+      await groceriesService.updateList(listId, {
+        date: groceryLists[idx].date,
+        items: groceryLists[idx].items,
+        recipes: groceryLists[idx].recipes,
+      });
+    } catch (error) {
+      console.error("Failed to add item", error);
+    }
   };
 
-  const removeItemFromList = (listIndex: number, itemId: number) => {
-    setGroceryLists((prevLists) =>
-      produce(prevLists, (draft) => {
-        draft[listIndex].items = draft[listIndex].items.filter(
+  const removeItemFromList = async (listId: string, itemId: number) => {
+    const idx = findListIndex(listId);
+    if (idx === -1) return;
+
+    setGroceryLists((prev) =>
+      produce(prev, (draft) => {
+        draft[idx].items = draft[idx].items.filter(
           (item) => item.id !== itemId
         );
       })
     );
+
+    try {
+      await groceriesService.updateList(listId, {
+        date: groceryLists[idx].date,
+        items: groceryLists[idx].items,
+        recipes: groceryLists[idx].recipes,
+      });
+    } catch (error) {
+      console.error("Failed to remove item", error);
+    }
   };
 
-  const setIsEditingList = (index: number, value: boolean) => {
+  const setIsEditingList = async (listId: string, value: boolean) => {
     if (value) {
       setGroceryLists((prev) =>
         produce(prev, (draft) => {
@@ -80,23 +267,18 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
           });
         })
       );
-
-      // Enable editing for the selected list, disable others
+      // Enable editing only for this list, disable others
       setIsEditingListState((prev) => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach((key) => {
-          newState[+key] = +key === index;
-        });
+        const newState = Object.keys(prev).reduce((acc, id) => {
+          acc[id] = id === listId && value;
+          return acc;
+        }, {} as { [id: string]: boolean });
         return newState;
       });
     } else {
-      // Turn off editing for just this list
-      setIsEditingListState((prev) => ({
-        ...prev,
-        [index]: false,
-      }));
+      // Disable edit mode for this list and save
+      setIsEditingListState((prev) => ({ ...prev, [listId]: false }));
 
-      //Cleanup for empty items on save
       setGroceryLists((prev) =>
         produce(prev, (draft) => {
           draft.forEach((list) => {
@@ -104,6 +286,28 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
           });
         })
       );
+
+      const idx = findListIndex(listId);
+      if (idx === -1) {
+        console.warn(`No DB id found for list ${listId}, skipping save.`);
+        return;
+      }
+
+      setIsSavingList(listId, true);
+      setSaveErrors(listId, null);
+
+      try {
+        await groceriesService.updateList(listId, {
+          date: groceryLists[idx].date,
+          items: groceryLists[idx].items,
+          recipes: groceryLists[idx].recipes,
+        });
+      } catch (error) {
+        console.error("Failed to save grocery list to DB", error);
+        setSaveErrors(listId, "Failed to save changes. Please try again.");
+      } finally {
+        setIsSavingList(listId, false);
+      }
     }
   };
 
@@ -117,6 +321,14 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
         updateItemName,
         addItemToList,
         removeItemFromList,
+
+        isSavingList,
+        setIsSavingList,
+        saveErrors,
+        setSaveErrors,
+
+        createNewList,
+        deleteList,
       }}
     >
       {children}
