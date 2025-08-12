@@ -13,7 +13,7 @@ interface Props {
   index: number; // keep numeric index for internal use if needed (like key)
 }
 
-const GroceryList = ({ id, date, items, recipes, index }: Props) => {
+const GroceryList = ({ id, date, items, recipes }: Props) => {
   const {
     isEditingList,
     setIsEditingList,
