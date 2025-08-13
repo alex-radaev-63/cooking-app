@@ -223,16 +223,6 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
         });
       })
     );
-
-    try {
-      await groceriesService.updateList(listId, {
-        date: groceryLists[idx].date,
-        items: groceryLists[idx].items,
-        recipes: groceryLists[idx].recipes,
-      });
-    } catch (error) {
-      console.error("Failed to add item", error);
-    }
   };
 
   const removeItemFromList = async (listId: string, itemId: number) => {
