@@ -54,13 +54,14 @@ export const groceriesService = {
   },
 
   // Create a new grocery list, returns the created row with id
-  async createList(newList: Omit<GroceryListProps, 'id' | 'created_at'>): Promise<GroceryListProps> {
+  async createList(newList: Omit<GroceryListProps, 'id'>): Promise<GroceryListProps> {
     const { data, error } = await supabase
       .from(TABLE_NAME)
       .insert({
         date: newList.date,
         items: newList.items,
         recipes: newList.recipes,
+        created_at: newList.created_at,
       })
       .select()
       .single();

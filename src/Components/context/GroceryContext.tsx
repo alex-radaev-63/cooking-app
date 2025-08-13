@@ -22,13 +22,9 @@ interface GroceryContextType {
     value: boolean,
     updatedItems?: GroceryItem[]
   ) => Promise<void>;
-  updateItemName: (
-    listId: string,
-    itemId: number,
-    newName: string
-  ) => Promise<void>;
-  addItemToList: (listId: string) => Promise<void>;
-  removeItemFromList: (listId: string, itemId: number) => Promise<void>;
+  updateItemName: (listId: string, itemId: number, newName: string) => void;
+  addItemToList: (listId: string) => void;
+  removeItemFromList: (listId: string, itemId: number) => void;
 
   isSavingList: { [id: string]: boolean };
   setIsSavingList: (listId: string, value: boolean) => void;
@@ -59,17 +55,25 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     async function fetchLists() {
       try {
         const lists = await groceriesService.getAllLists();
-        setGroceryLists(lists);
 
-        // Initialize per-list states by id
-        const editing = lists.reduce((acc, list) => {
+        // Sort descending by created_at or date
+        const sorted = lists.sort((a, b) => {
+          const dateA = new Date(a.created_at || a.date).getTime();
+          const dateB = new Date(b.created_at || b.date).getTime();
+          return dateB - dateA;
+        });
+
+        setGroceryLists(sorted);
+
+        // Initialize per-list states
+        const editing = sorted.reduce((acc, list) => {
           if (list.id) acc[list.id] = false;
           return acc;
         }, {} as { [id: string]: boolean });
         setIsEditingListState(editing);
         setIsSavingListState(editing);
         setSaveErrorsState(
-          lists.reduce((acc, list) => {
+          sorted.reduce((acc, list) => {
             if (list.id) acc[list.id] = null;
             return acc;
           }, {} as { [id: string]: string | null })
@@ -103,15 +107,16 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const formattedDate = format(new Date(), "MMMM d, yyyy");
-    const newList: Omit<GroceryListProps, "id" | "created_at"> = {
+    const newList: Omit<GroceryListProps, "id"> = {
       date: formattedDate,
       items: [],
       recipes: [],
+      created_at: new Date().toISOString(),
     };
 
     try {
       const createdList = await groceriesService.createList(newList);
-      setGroceryLists((prev) => [...prev, createdList]);
+      setGroceryLists((prev) => [createdList, ...prev]);
 
       if (createdList.id) {
         setIsEditingListState((prev) => ({
@@ -183,11 +188,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateItemName = async (
-    listId: string,
-    itemId: number,
-    newName: string
-  ) => {
+  const updateItemName = (listId: string, itemId: number, newName: string) => {
     const idx = findListIndex(listId);
     if (idx === -1) return;
 
@@ -197,19 +198,9 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
         if (item) item.name = newName;
       })
     );
-
-    try {
-      await groceriesService.updateList(listId, {
-        date: groceryLists[idx].date,
-        items: groceryLists[idx].items,
-        recipes: groceryLists[idx].recipes,
-      });
-    } catch (error) {
-      console.error("Failed to update item name", error);
-    }
   };
 
-  const addItemToList = async (listId: string) => {
+  const addItemToList = (listId: string) => {
     const idx = findListIndex(listId);
     if (idx === -1) return;
 
@@ -230,7 +221,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  const removeItemFromList = async (listId: string, itemId: number) => {
+  const removeItemFromList = (listId: string, itemId: number) => {
     const idx = findListIndex(listId);
     if (idx === -1) return;
 
@@ -241,16 +232,6 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
         );
       })
     );
-
-    try {
-      await groceriesService.updateList(listId, {
-        date: groceryLists[idx].date,
-        items: groceryLists[idx].items,
-        recipes: groceryLists[idx].recipes,
-      });
-    } catch (error) {
-      console.error("Failed to remove item", error);
-    }
   };
 
   const setIsEditingList = async (
