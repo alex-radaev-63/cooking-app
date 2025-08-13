@@ -36,7 +36,7 @@ const Navbar = () => {
       </NavLink>
       <nav className="hidden sm:flex text-gray-300 h-full">
         <NavLink className="main-nav-link" to="/">
-          Overview
+          Groceries
         </NavLink>
 
         <div className="main-nav-link relative justify-center group">
@@ -55,8 +55,8 @@ const Navbar = () => {
           </div>
         </div>
 
-        <NavLink className="main-nav-link" to="/groceries">
-          Groceries
+        <NavLink className="main-nav-link" to="/overview">
+          My Dashboard
         </NavLink>
       </nav>
 
@@ -98,7 +98,7 @@ const Navbar = () => {
               to="/"
               className="block px-4 py-4"
             >
-              Overview
+              Groceries
             </NavLink>
           </li>
 
@@ -133,10 +133,10 @@ const Navbar = () => {
           <li>
             <NavLink
               onClick={() => setOpen(false)}
-              to="/groceries"
+              to="/overview"
               className="block px-4 py-4"
             >
-              Groceries
+              My Dashboard
             </NavLink>
           </li>
 

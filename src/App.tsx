@@ -12,9 +12,9 @@ function App() {
         <Navbar />
 
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<Groceries />} />
+          <Route path="/overview" element={<Dashboard />} />
           <Route path="/recipes" element={<Recipes />} />
-          <Route path="/groceries" element={<Groceries />} />
         </Routes>
       </Router>
     </>

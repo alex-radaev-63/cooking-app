@@ -38,7 +38,7 @@ const RecipesDropdownMenu = () => {
         <div className="grid grid-cols-2 gap-x-4 sm:gap-y-2 pt-2">
           {cuisines.map((cuisine) => (
             <a
-              href={`/recipes/${cuisine}`}
+              href={`/recipes`}
               key={cuisine}
               className="py-1 px-2 rounded-lg hover:bg-slate-700 text-gray-400
                        hover:text-white transition-all duration-250ms ease-out"
