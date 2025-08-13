@@ -8,6 +8,7 @@ import {
 } from "react";
 import {
   groceriesService,
+  type GroceryItem,
   type GroceryListProps,
 } from "../../services/groceriesManageDB";
 import { produce } from "immer";
@@ -16,7 +17,11 @@ interface GroceryContextType {
   groceryLists: GroceryListProps[];
   toggleItemChecked: (listId: string, itemId: number) => Promise<void>;
   isEditingList: { [id: string]: boolean };
-  setIsEditingList: (listId: string, value: boolean) => Promise<void>;
+  setIsEditingList: (
+    listId: string,
+    value: boolean,
+    updatedItems?: GroceryItem[]
+  ) => Promise<void>;
   updateItemName: (
     listId: string,
     itemId: number,
@@ -248,56 +253,57 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const setIsEditingList = async (listId: string, value: boolean) => {
-    if (value) {
-      setGroceryLists((prev) =>
-        produce(prev, (draft) => {
-          draft.forEach((list) => {
-            list.items = list.items.filter((item) => item.name.trim() !== "");
-          });
-        })
-      );
-      // Enable editing only for this list, disable others
-      setIsEditingListState((prev) => {
-        const newState = Object.keys(prev).reduce((acc, id) => {
-          acc[id] = id === listId && value;
+  const setIsEditingList = async (
+    listId: string,
+    isEditing: boolean,
+    updatedItems?: GroceryItem[]
+  ) => {
+    const idx = findListIndex(listId);
+    if (idx === -1) {
+      console.warn(`No list found for ID ${listId}`);
+      return;
+    }
+
+    if (isEditing) {
+      // Enter edit mode — make sure only this list is editable
+      setIsEditingListState((prev) =>
+        Object.keys(prev).reduce((acc, id) => {
+          acc[id] = id === listId;
           return acc;
-        }, {} as { [id: string]: boolean });
-        return newState;
-      });
-    } else {
-      // Disable edit mode for this list and save
-      setIsEditingListState((prev) => ({ ...prev, [listId]: false }));
+        }, {} as Record<string, boolean>)
+      );
+      return;
+    }
 
+    // Exit edit mode
+    setIsEditingListState((prev) => ({ ...prev, [listId]: false }));
+
+    // If updatedItems were provided, update state before saving
+    if (updatedItems) {
       setGroceryLists((prev) =>
         produce(prev, (draft) => {
-          draft.forEach((list) => {
-            list.items = list.items.filter((item) => item.name.trim() !== "");
-          });
+          draft[idx].items = updatedItems.filter(
+            (item) => item.name.trim() !== ""
+          );
         })
       );
+    }
 
-      const idx = findListIndex(listId);
-      if (idx === -1) {
-        console.warn(`No DB id found for list ${listId}, skipping save.`);
-        return;
-      }
+    // Save to DB
+    setIsSavingList(listId, true);
+    setSaveErrors(listId, null);
 
-      setIsSavingList(listId, true);
-      setSaveErrors(listId, null);
-
-      try {
-        await groceriesService.updateList(listId, {
-          date: groceryLists[idx].date,
-          items: groceryLists[idx].items,
-          recipes: groceryLists[idx].recipes,
-        });
-      } catch (error) {
-        console.error("Failed to save grocery list to DB", error);
-        setSaveErrors(listId, "Failed to save changes. Please try again.");
-      } finally {
-        setIsSavingList(listId, false);
-      }
+    try {
+      await groceriesService.updateList(listId, {
+        date: groceryLists[idx].date,
+        items: updatedItems ?? groceryLists[idx].items,
+        recipes: groceryLists[idx].recipes,
+      });
+    } catch (error) {
+      console.error("Failed to save grocery list to DB", error);
+      setSaveErrors(listId, "Failed to save changes. Please try again.");
+    } finally {
+      setIsSavingList(listId, false);
     }
   };
 
@@ -330,5 +336,5 @@ export const useGroceryContext = () => {
   const context = useContext(GroceryContext);
   if (!context)
     throw new Error("useGroceryContext must be used within GroceryProvider");
-  return context;
+  return context as GroceryContextType;
 };
