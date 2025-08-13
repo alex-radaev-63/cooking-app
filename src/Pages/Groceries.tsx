@@ -9,7 +9,7 @@ const Groceries = () => {
     <div className="flex flex-col max-w-[600px] mx-auto p-2 mt-6 gap-4">
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between">
-          <h1 className="text-3xl font-medium text-white">Groceries</h1>
+          <h1 className="text-3xl font-medium text-white">Grocery Lists</h1>
           <button
             onClick={createNewList}
             className="flex items-center min-h-10 text-gray-200 gap-1 rounded-lg 
