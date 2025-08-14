@@ -5,14 +5,14 @@ import { FiMenu, FiX } from "react-icons/fi";
 
 import LoginPopUp from "./Authentication/LoginPopUp";
 import RecipesDropdownMenu from "./RecipesDropdownMenu";
-import { useAuth } from "./context/AuthContext"; // ✅ import useAuth
+import { useAuth } from "./context/AuthContext";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [isRecipesOpen, setIsRecipesOpen] = useState(false);
   const [isLoginOpen, setLoginOpen] = useState(false);
 
-  const { user, logOut } = useAuth(); // ✅ get user + logOut
+  const { user, logOut } = useAuth();
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;

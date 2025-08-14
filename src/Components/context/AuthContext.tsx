@@ -11,6 +11,9 @@ interface AuthContextValue {
     password: string
   ) => Promise<{ success: boolean; error?: string }>;
   logOut: () => Promise<void>;
+  isLoginOpen: boolean;
+  openLogin: () => void;
+  closeLogin: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -18,6 +21,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -64,8 +68,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await supabase.auth.signOut();
   };
 
+  const openLogin = () => setIsLoginOpen(true);
+  const closeLogin = () => setIsLoginOpen(false);
+
   return (
-    <AuthContext.Provider value={{ user, loading, logIn, logOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        logIn,
+        logOut,
+        isLoginOpen,
+        openLogin,
+        closeLogin,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
