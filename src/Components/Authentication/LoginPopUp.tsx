@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { ZodError } from "zod";
 import { useOutsidePopUpClose } from "../../hooks/useOutsidePopUpClose";
-import { loginSchema } from "../../utils/loginValidation";
+import { useAuth } from "../context/AuthContext";
 
 interface LoginPopUpProps {
   open: boolean;
@@ -10,61 +9,42 @@ interface LoginPopUpProps {
 }
 
 const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
+  const { logIn } = useAuth();
+
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{
-    login?: string;
-    password?: string;
-    auth?: string;
-  }>({});
-
-  //Closing pop-up on click outside or "Esc"
+  const [authError, setAuthError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const loginRef = useRef<HTMLDivElement | null>(null);
-
   useOutsidePopUpClose(
     loginRef as React.RefObject<HTMLDivElement>,
     onClose,
     open
   );
 
-  //Cleaning input fields upon close
-
   useEffect(() => {
     if (!open) {
       setLogin("");
       setPassword("");
-      setErrors({});
+      setAuthError("");
+      setLoading(false);
     }
   }, [open]);
 
-  //Form submission handling
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      loginSchema.parse({ login, password });
-      setErrors({});
+    setLoading(true);
+    setAuthError("");
 
-      if (login !== "test@example.com" || password !== "Test1234") {
-        setErrors({ auth: "Your login or password is incorrect" });
-        return;
-      }
+    const { success, error } = await logIn(login, password);
+    setLoading(false);
 
-      alert("Logged in successfully!");
-      onClose();
-    } catch (err) {
-      if (err instanceof ZodError) {
-        const fieldErrors: { login?: string; password?: string } = {};
-        for (const issue of err.issues) {
-          const field = issue.path[0] as "login" | "password";
-          fieldErrors[field] = issue.message;
-        }
-        setErrors(fieldErrors);
-      } else {
-        console.error("Unexpected error:", err);
-      }
+    if (success) {
+      onClose(); // ✅ Close popup automatically on login
+    } else {
+      setAuthError(error || "Login failed");
     }
   };
 
@@ -78,8 +58,7 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
       >
         <button
           onClick={onClose}
-          className="absolute top-1 right-3 text-gray-500 text-3xl font-regular
-           hover:cursor-pointer hover:text-gray-400"
+          className="absolute top-1 right-3 text-gray-500 text-3xl font-regular hover:cursor-pointer hover:text-gray-400"
           aria-label="Close login popup"
         >
           ×
@@ -98,12 +77,9 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
               value={login}
               onChange={(e) => setLogin(e.target.value)}
               className={`input-default ${
-                errors.login ? "input-error" : "input-focus"
+                authError ? "input-error" : "input-focus"
               }`}
             />
-            {errors.login && (
-              <p className="mt-1 text-sm text-red-400">{errors.login}</p>
-            )}
           </div>
 
           <div>
@@ -115,7 +91,7 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={`input-default ${
-                  errors.password ? "input-error" : "input-focus"
+                  authError ? "input-error" : "input-focus"
                 }`}
               />
               <button
@@ -127,20 +103,17 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
                 {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
               </button>
             </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-400">{errors.password}</p>
-            )}
           </div>
 
-          {errors.auth && <p className="text-sm text-red-400">{errors.auth}</p>}
+          {authError && <p className="text-sm text-red-400">{authError}</p>}
 
           <div className="flex justify-center">
             <button
               type="submit"
-              disabled={!login.trim() || !password.trim()}
+              disabled={loading || !login.trim() || !password.trim()}
               className="mt-8 btn-primary px-6 min-h-12"
             >
-              Log In
+              {loading ? "Logging in..." : "Log In"}
             </button>
           </div>
         </form>

@@ -5,11 +5,14 @@ import { FiMenu, FiX } from "react-icons/fi";
 
 import LoginPopUp from "./Authentication/LoginPopUp";
 import RecipesDropdownMenu from "./RecipesDropdownMenu";
+import { useAuth } from "./context/AuthContext"; // ✅ import useAuth
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [isRecipesOpen, setIsRecipesOpen] = useState(false);
   const [isLoginOpen, setLoginOpen] = useState(false);
+
+  const { user, logOut } = useAuth(); // ✅ get user + logOut
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
@@ -34,6 +37,8 @@ const Navbar = () => {
           </span>
         </div>
       </NavLink>
+
+      {/* Desktop Menu */}
       <nav className="hidden sm:flex text-gray-300 h-full">
         <NavLink className="main-nav-link" to="/">
           Groceries
@@ -60,15 +65,23 @@ const Navbar = () => {
         </NavLink>
       </nav>
 
-      <button
-        className="btn-primary hidden sm:block"
-        onClick={() => setLoginOpen(true)}
-      >
-        Log In
-      </button>
+      {/* Desktop Auth Buttons */}
+      {user ? (
+        <button className="btn-destructive hidden sm:block" onClick={logOut}>
+          Log Out
+        </button>
+      ) : (
+        <button
+          className="btn-primary hidden sm:block"
+          onClick={() => setLoginOpen(true)}
+        >
+          Log In
+        </button>
+      )}
 
       <LoginPopUp open={isLoginOpen} onClose={() => setLoginOpen(false)} />
 
+      {/* Mobile Menu Toggle */}
       <button
         onClick={() => setOpen((o) => !o)}
         className="sm:hidden p-2 hover:cursor-pointer"
@@ -81,8 +94,7 @@ const Navbar = () => {
         )}
       </button>
 
-      {/* - Mobile Collapsible Menu Nav */}
-
+      {/* Mobile Menu */}
       <nav
         className={`absolute inset-x-0 top-[72px]
               mx-2 overflow-hidden rounded-xl border border-slate-700 bg-slate-800
@@ -141,12 +153,27 @@ const Navbar = () => {
           </li>
 
           <li className="mt-2 px-4 pb-1">
-            <button
-              className="btn-primary w-full p-2.5"
-              onClick={() => setLoginOpen(true)}
-            >
-              Log In
-            </button>
+            {user ? (
+              <button
+                className="btn-destructive bg-slate-700/50 hover:bg-red-500/25 w-full p-2.5"
+                onClick={() => {
+                  logOut();
+                  setOpen(false);
+                }}
+              >
+                Log Out
+              </button>
+            ) : (
+              <button
+                className="btn-primary w-full p-2.5"
+                onClick={() => {
+                  setLoginOpen(true);
+                  setOpen(false);
+                }}
+              >
+                Log In
+              </button>
+            )}
           </li>
         </ul>
       </nav>
