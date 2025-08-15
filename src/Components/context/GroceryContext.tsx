@@ -166,26 +166,30 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
   const findListIndex = (listId: string) =>
     groceryLists.findIndex((list) => list.id === listId);
 
+  // Check or uncheck grocery items
   const toggleItemChecked = async (listId: string, itemId: number) => {
     const idx = findListIndex(listId);
     if (idx === -1) return;
 
-    setGroceryLists((prev) =>
-      produce(prev, (draft) => {
+    setGroceryLists((prev) => {
+      const updated = produce(prev, (draft) => {
         const item = draft[idx]?.items.find((i) => i.id === itemId);
         if (item) item.checked = !item.checked;
-      })
-    );
-
-    try {
-      await groceriesService.updateList(listId, {
-        date: groceryLists[idx].date,
-        items: groceryLists[idx].items,
-        recipes: groceryLists[idx].recipes,
       });
-    } catch (error) {
-      console.error("Failed to update item checked", error);
-    }
+
+      // Save updated list to DB immediately with fresh state
+      groceriesService
+        .updateList(listId, {
+          date: updated[idx].date,
+          items: updated[idx].items,
+          recipes: updated[idx].recipes,
+        })
+        .catch((error) => {
+          console.error("Failed to update item checked", error);
+        });
+
+      return updated;
+    });
   };
 
   const updateItemName = (listId: string, itemId: number, newName: string) => {
@@ -204,8 +208,8 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     const idx = findListIndex(listId);
     if (idx === -1) return;
 
-    setGroceryLists((prev) =>
-      produce(prev, (draft) => {
+    setGroceryLists((prev) => {
+      const updated = produce(prev, (draft) => {
         const currentItems = draft[idx].items;
         const nextId =
           currentItems.length > 0
@@ -217,8 +221,10 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
           name: "",
           checked: false,
         });
-      })
-    );
+      });
+
+      return updated;
+    });
   };
 
   const removeItemFromList = (listId: string, itemId: number) => {
@@ -246,7 +252,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (isEditing) {
-      // Enter edit mode — make sure only this list is editable
+      // Enter edit mode — only this list editable
       setIsEditingListState((prev) =>
         Object.keys(prev).reduce((acc, id) => {
           acc[id] = id === listId;
@@ -256,36 +262,37 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    // Exit edit mode
+    // Exit edit mode and save
     setIsEditingListState((prev) => ({ ...prev, [listId]: false }));
 
-    // If updatedItems were provided, update state before saving
-    if (updatedItems) {
-      setGroceryLists((prev) =>
-        produce(prev, (draft) => {
+    setGroceryLists((prev) => {
+      const updated = produce(prev, (draft) => {
+        if (updatedItems) {
           draft[idx].items = updatedItems.filter(
             (item) => item.name.trim() !== ""
           );
-        })
-      );
-    }
-
-    // Save to DB
-    setIsSavingList(listId, true);
-    setSaveErrors(listId, null);
-
-    try {
-      await groceriesService.updateList(listId, {
-        date: groceryLists[idx].date,
-        items: updatedItems ?? groceryLists[idx].items,
-        recipes: groceryLists[idx].recipes,
+        }
       });
-    } catch (error) {
-      console.error("Failed to save grocery list to DB", error);
-      setSaveErrors(listId, "Failed to save changes. Please try again.");
-    } finally {
-      setIsSavingList(listId, false);
-    }
+
+      setIsSavingList(listId, true);
+      setSaveErrors(listId, null);
+
+      groceriesService
+        .updateList(listId, {
+          date: updated[idx].date,
+          items: updatedItems ?? updated[idx].items,
+          recipes: updated[idx].recipes,
+        })
+        .catch((error) => {
+          console.error("Failed to save grocery list to DB", error);
+          setSaveErrors(listId, "Failed to save changes. Please try again.");
+        })
+        .finally(() => {
+          setIsSavingList(listId, false);
+        });
+
+      return updated;
+    });
   };
 
   return (

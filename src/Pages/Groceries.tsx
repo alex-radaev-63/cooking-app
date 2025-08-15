@@ -5,8 +5,16 @@ import { useAuth } from "../Components/context/AuthContext";
 import LoginPopUp from "../Components/Authentication/LoginPopUp";
 
 const Groceries = () => {
-  const { user, isLoginOpen, openLogin, closeLogin } = useAuth();
+  const { user, loading, isLoginOpen, openLogin, closeLogin } = useAuth();
   const { createNewList } = useGroceryContext();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center mt-10 text-slate-500">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col max-w-[600px] mx-auto p-4 mt-6 gap-4">

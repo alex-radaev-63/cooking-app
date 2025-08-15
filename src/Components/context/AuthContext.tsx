@@ -24,14 +24,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   useEffect(() => {
+    // Check session on first load
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
+    // Listen to auth state changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
+        setLoading(false); // ✅ make sure loading is false after state change
       }
     );
 
@@ -42,21 +45,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logIn = async (email: string, password: string) => {
     try {
-      // Frontend validation
+      // ✅ Frontend validation
       loginSchema.parse({ login: email, password });
 
-      // Supabase login
-      const { error } = await supabase.auth.signInWithPassword({
+      setLoading(true); // ✅ Start loading before login
+
+      // ✅ Supabase login
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        setLoading(false);
         return { success: false, error: error.message };
       }
 
+      // ✅ Immediately set user so UI updates without waiting for event
+      setUser(data.user);
+      setLoading(false);
+
       return { success: true };
     } catch (err) {
+      setLoading(false);
       if (err instanceof ZodError) {
         return { success: false, error: err.issues[0].message };
       }
@@ -65,7 +76,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logOut = async () => {
+    setLoading(true);
     await supabase.auth.signOut();
+    setUser(null);
+    setLoading(false);
   };
 
   const openLogin = () => setIsLoginOpen(true);
