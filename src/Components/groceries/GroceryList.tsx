@@ -1,5 +1,10 @@
 import { useRef, useState, useEffect } from "react";
-import { FaPencil, FaTrashCan } from "react-icons/fa6";
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaPencil,
+  FaTrashCan,
+} from "react-icons/fa6";
 import { useGroceryContext } from "../context/GroceryContext";
 
 interface Props {
@@ -20,10 +25,10 @@ const GroceryList = ({ id, date, items }: Props) => {
   } = useGroceryContext();
 
   const [editText, setEditText] = useState("");
+  const [showAll, setShowAll] = useState(false); // 👈 new state
 
   const listitemsRef = useRef<HTMLTextAreaElement>(null);
 
-  // Resizing text area when entering items
   useEffect(() => {
     if (listitemsRef.current) {
       listitemsRef.current.style.height = "auto";
@@ -56,6 +61,9 @@ const GroceryList = ({ id, date, items }: Props) => {
     await setIsEditingList(id, false, newItems);
   };
 
+  // 👉 limit displayed items
+  const displayedItems = showAll ? items : items.slice(0, 7);
+
   return (
     <div className="flex flex-col gap-3">
       <div className="rounded-xl border border-slate-700 bg-slate-800 px-6 py-5 text-white">
@@ -85,24 +93,44 @@ const GroceryList = ({ id, date, items }: Props) => {
         {/* Grocery items */}
         <div className="flex flex-col mt-4 mb-2 gap-3">
           {!isEditingList[id] ? (
-            <ul className="flex flex-col gap-3">
-              {items.map((item) => (
-                <label
-                  key={item.id}
-                  className="flex flex-row gap-3 items-center min-h-[28px]"
+            <>
+              <ul className="flex flex-col gap-3">
+                {displayedItems.map((item) => (
+                  <label
+                    key={item.id}
+                    className="flex flex-row gap-3 items-center min-h-[28px]"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={item.checked}
+                      onChange={() => toggleItemChecked(id, item.id)}
+                      className="accent-green-300 min-h-5 min-w-5"
+                    />
+                    <span className={item.checked ? "text-slate-500" : ""}>
+                      {item.name}
+                    </span>
+                  </label>
+                ))}
+              </ul>
+
+              {/* See more / See less button */}
+              {items.length > 7 && (
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="mt-2 flex items-center text-slate-300 cursor-pointer"
                 >
-                  <input
-                    type="checkbox"
-                    checked={item.checked}
-                    onChange={() => toggleItemChecked(id, item.id)}
-                    className="accent-green-300 min-h-5 min-w-5"
-                  />
-                  <span className={item.checked ? "text-slate-500" : ""}>
-                    {item.name}
-                  </span>
-                </label>
-              ))}
-            </ul>
+                  {showAll ? (
+                    <>
+                      See less <FaChevronUp className="ml-2 text-sm mt-0.5" />
+                    </>
+                  ) : (
+                    <>
+                      See more <FaChevronDown className="ml-2 text-sm mt-0.5" />
+                    </>
+                  )}
+                </button>
+              )}
+            </>
           ) : (
             <textarea
               value={editText}
@@ -123,7 +151,7 @@ const GroceryList = ({ id, date, items }: Props) => {
              transition-all ease-out duration-250"
             onClick={() => setIsEditingList(id, true)}
           >
-            <span className="">+ Add first item</span>
+            + Add first item
           </button>
         )}
 
