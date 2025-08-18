@@ -26,6 +26,7 @@ interface GroceryContextType {
   updateItemName: (listId: string, itemId: number, newName: string) => void;
   addItemToList: (listId: string) => void;
   removeItemFromList: (listId: string, itemId: number) => void;
+  setTotal: (listId: string, value: number) => void;
 
   isSavingList: { [id: string]: boolean };
   setIsSavingList: (listId: string, value: boolean) => void;
@@ -121,6 +122,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
       items: [],
       recipes: [],
       created_at: new Date().toISOString(),
+      total: null,
     };
 
     try {
@@ -192,6 +194,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
           date: updated[idx].date,
           items: updated[idx].items,
           recipes: updated[idx].recipes,
+          total: updated[idx].total,
         })
         .catch((error) => {
           console.error("Failed to update item checked", error);
@@ -249,6 +252,17 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const setTotal = (listId: string, value: number) => {
+    const idx = findListIndex(listId);
+    if (idx === -1) return;
+
+    setGroceryLists((prev) =>
+      produce(prev, (draft) => {
+        draft[idx].total = value;
+      })
+    );
+  };
+
   const setIsEditingList = async (
     listId: string,
     isEditing: boolean,
@@ -291,6 +305,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
           date: updated[idx].date,
           items: updatedItems ?? updated[idx].items,
           recipes: updated[idx].recipes,
+          total: updated[idx].total,
         })
         .catch((error) => {
           console.error("Failed to save grocery list to DB", error);
@@ -314,6 +329,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
         updateItemName,
         addItemToList,
         removeItemFromList,
+        setTotal,
 
         isSavingList,
         setIsSavingList,

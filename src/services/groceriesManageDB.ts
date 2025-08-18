@@ -13,6 +13,7 @@ export interface GroceryListProps {
   items: GroceryItem[];
   recipes: string[];
   created_at?: string;
+  total: number | null;
 }
 
 const TABLE_NAME = 'grocery_lists';
@@ -22,7 +23,7 @@ export const groceriesService = {
   async getAllLists(): Promise<GroceryListProps[]> {
     const { data, error } = await supabase
       .from(TABLE_NAME)
-      .select('id, date, items, recipes, created_at')
+      .select('id, date, items, recipes, created_at, total')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -41,6 +42,7 @@ export const groceriesService = {
         date: updatedList.date,
         items: updatedList.items,
         recipes: updatedList.recipes,
+        total: updatedList.total,
       })
       .eq('id', listId)
       .select()
@@ -62,6 +64,7 @@ export const groceriesService = {
         items: newList.items,
         recipes: newList.recipes,
         created_at: newList.created_at,
+        total: newList.total,
       })
       .select()
       .single();

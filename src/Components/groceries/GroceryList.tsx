@@ -12,9 +12,10 @@ interface Props {
   date: string;
   items: { id: number; name: string; checked: boolean }[];
   recipes: string[];
+  total: number | null;
 }
 
-const GroceryList = ({ id, date, items }: Props) => {
+const GroceryList = ({ id, date, items, total }: Props) => {
   const {
     isEditingList,
     setIsEditingList,
@@ -22,6 +23,7 @@ const GroceryList = ({ id, date, items }: Props) => {
     saveErrors,
     deleteList,
     toggleItemChecked,
+    setTotal,
   } = useGroceryContext();
 
   const [editText, setEditText] = useState("");
@@ -69,7 +71,7 @@ const GroceryList = ({ id, date, items }: Props) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="rounded-xl border border-slate-700 bg-slate-800 px-6 py-5 text-white">
+      <div className="flex flex-col gap-8 rounded-xl border border-slate-700 bg-slate-800 px-6 py-5 text-white">
         {/* Top row */}
         <div className="flex flex-row justify-between items-center">
           <div className="flex flex-row gap-3 items-center">
@@ -100,7 +102,7 @@ const GroceryList = ({ id, date, items }: Props) => {
         </div>
 
         {/* Grocery items */}
-        <div className="flex flex-col mt-4 mb-2 gap-3">
+        <div className="flex flex-col relative mb-2 gap-3">
           {!isEditingList[id] ? (
             <>
               <ul className="flex flex-col gap-3">
@@ -125,7 +127,7 @@ const GroceryList = ({ id, date, items }: Props) => {
               {items.length > 7 && (
                 <button
                   onClick={() => setShowAll(!showAll)}
-                  className="mt-2 flex items-center text-slate-300 cursor-pointer"
+                  className="absolute right-4 bottom-0 flex items-center text-slate-300 cursor-pointer"
                 >
                   {showAll ? (
                     <>
@@ -151,6 +153,44 @@ const GroceryList = ({ id, date, items }: Props) => {
           )}
         </div>
 
+        {/* Total price of groceries (grocery bill) */}
+        <div className="flex flex-row justify-between items-end">
+          <div className="flex flex-col gap-1">
+            <h4 className="text-md text-slate-500">Total</h4>
+            <div>
+              {isEditingList[id] ? (
+                <input
+                  type="number"
+                  value={total ?? 0} // default to 0 if total is null
+                  onChange={(e) => setTotal(id, parseFloat(e.target.value))}
+                  className="w-[120px] h-[40px] p-1 rounded bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  step="0.01"
+                  min="0"
+                />
+              ) : (
+                <span className="text-xl text-white font-medium">
+                  {total !== null ? `$ ${total.toFixed(2)}` : "-"}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Save button */}
+          {isEditingList[id] && (
+            <div className="flex flex-col items-end pt-8">
+              <button
+                onClick={handleSaveEdits}
+                className="btn-primary"
+                disabled={isSavingList[id]}
+              >
+                {isSavingList[id] ? "Saving..." : "Save Edits"}
+              </button>
+              {saveErrors[id] && (
+                <p className="text-red-500 text-sm mt-1">{saveErrors[id]}</p>
+              )}
+            </div>
+          )}
+        </div>
         {items.length === 0 && !isEditingList[id] && (
           <button
             className="flex flex-row justify-center items-center w-full h-[64px] 
@@ -161,22 +201,6 @@ const GroceryList = ({ id, date, items }: Props) => {
           >
             + Add first item
           </button>
-        )}
-
-        {/* Save button */}
-        {isEditingList[id] && (
-          <div className="flex flex-col items-end pt-8">
-            <button
-              onClick={handleSaveEdits}
-              className="btn-primary"
-              disabled={isSavingList[id]}
-            >
-              {isSavingList[id] ? "Saving..." : "Save Edits"}
-            </button>
-            {saveErrors[id] && (
-              <p className="text-red-500 text-sm mt-1">{saveErrors[id]}</p>
-            )}
-          </div>
         )}
       </div>
     </div>
