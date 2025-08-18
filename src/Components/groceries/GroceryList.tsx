@@ -64,7 +64,7 @@ const GroceryList = ({ id, date, items, total }: Props) => {
   };
 
   // Set a limit for max displayed items per list (by default)
-  const displayedItems = showAll ? items : items.slice(0, 7);
+  const displayedItems = showAll ? items : items.slice(0, 5);
 
   // Checking if list is complete
   const isCompleted = items.length > 0 && items.every((item) => item.checked);
