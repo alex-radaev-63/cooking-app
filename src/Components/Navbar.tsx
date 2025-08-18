@@ -27,7 +27,7 @@ const Navbar = () => {
   }, [open]);
 
   return (
-    <header className="flex justify-between items-center h-[60px] p-2 pl-4 m-2 border-0 rounded-xl border-slate-700 bg-slate-800">
+    <header className="flex flex-row justify-between items-center h-[60px] p-2 pl-4 m-2 border-0 rounded-xl border-slate-700 bg-slate-800">
       <NavLink to="/">
         <div className="flex h-8 text-green-300 font-gluten font-medium text-4xl">
           <span className="text-4xl">
@@ -96,7 +96,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <nav
-        className={`absolute inset-x-0 top-[72px]
+        className={`absolute z-999 inset-x-0 top-[72px]
               mx-2 overflow-hidden rounded-xl border border-slate-700 bg-slate-800
               text-gray-300 transition-[max-height] duration-350 ease-in
               sm:hidden ${
