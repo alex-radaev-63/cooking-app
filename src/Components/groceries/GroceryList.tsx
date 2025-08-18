@@ -23,13 +23,14 @@ const GroceryList = ({ id, date, items }: Props) => {
 
   const listitemsRef = useRef<HTMLTextAreaElement>(null);
 
+  // Resizing text area when entering items
   useEffect(() => {
     if (listitemsRef.current) {
-      listitemsRef.current.style.height = "auto"; // reset height
+      listitemsRef.current.style.height = "auto";
       listitemsRef.current.style.height =
         listitemsRef.current.scrollHeight + "px";
     }
-  }, [editText]);
+  }, [editText, isEditingList[id]]);
 
   useEffect(() => {
     if (isEditingList[id]) {
