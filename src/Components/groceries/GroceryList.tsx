@@ -25,7 +25,7 @@ const GroceryList = ({ id, date, items }: Props) => {
   } = useGroceryContext();
 
   const [editText, setEditText] = useState("");
-  const [showAll, setShowAll] = useState(false); // 👈 new state
+  const [showAll, setShowAll] = useState(false);
 
   const listitemsRef = useRef<HTMLTextAreaElement>(null);
 
@@ -61,16 +61,25 @@ const GroceryList = ({ id, date, items }: Props) => {
     await setIsEditingList(id, false, newItems);
   };
 
-  // 👉 limit displayed items
+  // Set a limit for max displayed items per list (by default)
   const displayedItems = showAll ? items : items.slice(0, 7);
+
+  // Checking if list is complete
+  const isCompleted = items.length > 0 && items.every((item) => item.checked);
 
   return (
     <div className="flex flex-col gap-3">
       <div className="rounded-xl border border-slate-700 bg-slate-800 px-6 py-5 text-white">
         {/* Top row */}
         <div className="flex flex-row justify-between items-center">
-          <h3 className="text-xl font-medium">{date}</h3>
-
+          <div className="flex flex-row gap-3 items-center">
+            <h3 className="text-xl font-medium">{date}</h3>
+            {isCompleted && (
+              <span className="flex flex-col mt-0.5 pb-0.25 h-[24px] justify-center px-2 text-xs text-green-300 bg-green-300/20 border-[1.5px] border-green-300/50 rounded-lg">
+                completed
+              </span>
+            )}
+          </div>
           {!isEditingList[id] ? (
             <button
               onClick={() => setIsEditingList(id, true)}
@@ -113,7 +122,6 @@ const GroceryList = ({ id, date, items }: Props) => {
                 ))}
               </ul>
 
-              {/* See more / See less button */}
               {items.length > 7 && (
                 <button
                   onClick={() => setShowAll(!showAll)}
