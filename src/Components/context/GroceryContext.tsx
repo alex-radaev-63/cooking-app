@@ -12,6 +12,7 @@ import {
   type GroceryListProps,
 } from "../../services/groceriesManageDB";
 import { produce } from "immer";
+import { useAuth } from "./AuthContext";
 
 interface GroceryContextType {
   groceryLists: GroceryListProps[];
@@ -51,8 +52,16 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
   }>({});
 
   // Fetch lists once on mount
+
+  const { user } = useAuth();
+
   useEffect(() => {
     async function fetchLists() {
+      if (!user) {
+        setGroceryLists([]);
+        return;
+      }
+
       try {
         const lists = await groceriesService.getAllLists();
 
@@ -83,7 +92,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     fetchLists();
-  }, []);
+  }, [user]);
 
   // Setters for saving and errors by list id
   const setIsSavingList = (listId: string, value: boolean) => {
