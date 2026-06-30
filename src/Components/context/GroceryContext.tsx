@@ -12,7 +12,7 @@ import {
   type GroceryListProps,
 } from "../../services/groceriesManageDB";
 import { produce } from "immer";
-import { useAuth } from "./AuthContext";
+// import { useAuth } from "./AuthContext";
 
 interface GroceryContextType {
   groceryLists: GroceryListProps[];
@@ -54,7 +54,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch lists once on mount
 
-  const { user } = useAuth();
+  // const { user } = useAuth();
 
   useEffect(() => {
     async function fetchLists() {
