@@ -21,7 +21,7 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
   useOutsidePopUpClose(
     loginRef as React.RefObject<HTMLDivElement>,
     onClose,
-    open
+    open,
   );
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
     setLoading(false);
 
     if (success) {
-      onClose(); // ✅ Close popup automatically on login
+      onClose(); // Close popup automatically on login
     } else {
       setAuthError(error || "Login failed");
     }

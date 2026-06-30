@@ -21,7 +21,7 @@ interface GroceryContextType {
   setIsEditingList: (
     listId: string,
     value: boolean,
-    updatedItems?: GroceryItem[]
+    updatedItems?: GroceryItem[],
   ) => Promise<void>;
   updateItemName: (listId: string, itemId: number, newName: string) => void;
   addItemToList: (listId: string) => void;
@@ -58,10 +58,12 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     async function fetchLists() {
-      if (!user) {
-        setGroceryLists([]);
-        return;
-      }
+      // Preventing lists fetch if user is not logged in
+
+      // if (!user) {
+      //   setGroceryLists([]);
+      //   return;
+      // }
 
       try {
         const lists = await groceriesService.getAllLists();
@@ -76,24 +78,33 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
         setGroceryLists(sorted);
 
         // Initialize per-list states
-        const editing = sorted.reduce((acc, list) => {
-          if (list.id) acc[list.id] = false;
-          return acc;
-        }, {} as { [id: string]: boolean });
+        const editing = sorted.reduce(
+          (acc, list) => {
+            if (list.id) acc[list.id] = false;
+            return acc;
+          },
+          {} as { [id: string]: boolean },
+        );
+
         setIsEditingListState(editing);
         setIsSavingListState(editing);
+
         setSaveErrorsState(
-          sorted.reduce((acc, list) => {
-            if (list.id) acc[list.id] = null;
-            return acc;
-          }, {} as { [id: string]: string | null })
+          sorted.reduce(
+            (acc, list) => {
+              if (list.id) acc[list.id] = null;
+              return acc;
+            },
+            {} as Record<string, string | null>,
+          ),
         );
       } catch (error) {
-        console.error("Failed to load grocery lists", error);
+        console.error(error);
       }
     }
+
     fetchLists();
-  }, [user]);
+  }, []);
 
   // Setters for saving and errors by list id
   const setIsSavingList = (listId: string, value: boolean) => {
@@ -106,12 +117,12 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
 
   const createNewList = async () => {
     const hasEmptyList = groceryLists.some(
-      (list) => list.items.length === 0 && list.recipes.length === 0
+      (list) => list.items.length === 0 && list.recipes.length === 0,
     );
 
     if (hasEmptyList) {
       alert(
-        "You already have an empty list. Please fill or delete it before adding a new one."
+        "You already have an empty list. Please fill or delete it before adding a new one.",
       );
       return;
     }
@@ -212,7 +223,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
       produce(prev, (draft) => {
         const item = draft[idx]?.items.find((i) => i.id === itemId);
         if (item) item.name = newName;
-      })
+      }),
     );
   };
 
@@ -246,9 +257,9 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     setGroceryLists((prev) =>
       produce(prev, (draft) => {
         draft[idx].items = draft[idx].items.filter(
-          (item) => item.id !== itemId
+          (item) => item.id !== itemId,
         );
-      })
+      }),
     );
   };
 
@@ -259,14 +270,14 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     setGroceryLists((prev) =>
       produce(prev, (draft) => {
         draft[idx].total = value;
-      })
+      }),
     );
   };
 
   const setIsEditingList = async (
     listId: string,
     isEditing: boolean,
-    updatedItems?: GroceryItem[]
+    updatedItems?: GroceryItem[],
   ) => {
     const idx = findListIndex(listId);
     if (idx === -1) {
@@ -277,10 +288,13 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     if (isEditing) {
       // Enter edit mode — only this list editable
       setIsEditingListState((prev) =>
-        Object.keys(prev).reduce((acc, id) => {
-          acc[id] = id === listId;
-          return acc;
-        }, {} as Record<string, boolean>)
+        Object.keys(prev).reduce(
+          (acc, id) => {
+            acc[id] = id === listId;
+            return acc;
+          },
+          {} as Record<string, boolean>,
+        ),
       );
       return;
     }
@@ -292,7 +306,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
       const updated = produce(prev, (draft) => {
         if (updatedItems) {
           draft[idx].items = updatedItems.filter(
-            (item) => item.name.trim() !== ""
+            (item) => item.name.trim() !== "",
           );
         }
       });

@@ -6,6 +6,7 @@ import {
   FaTrashCan,
 } from "react-icons/fa6";
 import { useGroceryContext } from "../context/GroceryContext";
+import { useAuth } from "../context/AuthContext";
 
 interface Props {
   id: string;
@@ -28,6 +29,8 @@ const GroceryList = ({ id, date, items, total }: Props) => {
 
   const [editText, setEditText] = useState("");
   const [showAll, setShowAll] = useState(false);
+
+  const { user } = useAuth();
 
   const listitemsRef = useRef<HTMLTextAreaElement>(null);
 
@@ -82,23 +85,25 @@ const GroceryList = ({ id, date, items, total }: Props) => {
               </span>
             )}
           </div>
-          {!isEditingList[id] ? (
-            <button
-              onClick={() => setIsEditingList(id, true)}
-              className="flex py-2 px-4 text-gray-400 items-center rounded-lg hover:bg-slate-700 hover:text-white cursor-pointer"
-            >
-              <FaPencil size="12px" className="mr-2" />
-              Edit
-            </button>
-          ) : (
-            <button
-              onClick={() => deleteList(id, true)}
-              className="flex py-2 px-4 text-gray-400 items-center rounded-lg hover:bg-slate-700 hover:text-white cursor-pointer"
-            >
-              <FaTrashCan size="12px" className="mr-2" />
-              Delete List
-            </button>
-          )}
+
+          {user &&
+            (!isEditingList[id] ? (
+              <button
+                onClick={() => setIsEditingList(id, true)}
+                className="flex py-2 px-4 text-gray-400 items-center rounded-lg hover:bg-slate-700 hover:text-white cursor-pointer"
+              >
+                <FaPencil size="12px" className="mr-2" />
+                Edit
+              </button>
+            ) : (
+              <button
+                onClick={() => deleteList(id, true)}
+                className="flex py-2 px-4 text-gray-400 items-center rounded-lg hover:bg-slate-700 hover:text-white cursor-pointer"
+              >
+                <FaTrashCan size="12px" className="mr-2" />
+                Delete List
+              </button>
+            ))}
         </div>
 
         {/* Grocery items */}

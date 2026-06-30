@@ -19,13 +19,10 @@ const Groceries = () => {
   return (
     <div className="flex flex-col max-w-[600px] mx-auto p-4 mt-6 gap-4">
       <div className="flex flex-col gap-4">
-        <div
-          className={`flex flex-row ${
-            !user ? "justify-center mt-8 mb-[-8px]" : "justify-between"
-          }`}
-        >
+        <div className="flex flex-row justify-between min-h-10 items-center">
           <h1 className="text-[28px] font-medium text-white">Grocery Lists</h1>
-          {user && (
+
+          {user ? (
             <button
               onClick={createNewList}
               className="flex items-center min-h-10 text-gray-200 gap-1 rounded-lg 
@@ -34,10 +31,21 @@ const Groceries = () => {
             >
               <FaPlus size={14} className="mr-1.5 mt-0.5 " /> New List
             </button>
+          ) : (
+            <span className="text-slate-500">
+              Please
+              <button
+                onClick={openLogin}
+                className="underline hover:text-slate-100 mx-1.5 cursor-pointer transition-colors"
+              >
+                log in
+              </button>
+              to edit grocery lists
+            </span>
           )}
         </div>
 
-        {!user ? (
+        {/* {!user ? (
           <div className="flex justify-center">
             <span className="text-slate-500">
               Please
@@ -52,8 +60,10 @@ const Groceries = () => {
           </div>
         ) : (
           <GroceryFeed />
-        )}
+        )}*/}
       </div>
+
+      <GroceryFeed />
 
       {/* Login popup controlled via AuthContext */}
       <LoginPopUp open={isLoginOpen} onClose={closeLogin} />

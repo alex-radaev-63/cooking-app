@@ -8,7 +8,7 @@ interface AuthContextValue {
   loading: boolean;
   logIn: (
     email: string,
-    password: string
+    password: string,
   ) => Promise<{ success: boolean; error?: string }>;
   logOut: () => Promise<void>;
   isLoginOpen: boolean;
@@ -34,8 +34,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
-        setLoading(false); // ✅ make sure loading is false after state change
-      }
+        setLoading(false); // Make sure loading is false after state change
+      },
     );
 
     return () => {
@@ -45,12 +45,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logIn = async (email: string, password: string) => {
     try {
-      // ✅ Frontend validation
+      // Frontend validation
       loginSchema.parse({ login: email, password });
 
-      setLoading(true); // ✅ Start loading before login
+      setLoading(true); // Start loading before login
 
-      // ✅ Supabase login
+      // Supabase login
       const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { success: false, error: error.message };
       }
 
-      // ✅ Immediately set user so UI updates without waiting for event
+      // Immediately set user so UI updates without waiting for event
       setUser(data.user);
       setLoading(false);
 
