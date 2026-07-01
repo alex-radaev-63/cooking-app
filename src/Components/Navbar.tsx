@@ -40,11 +40,11 @@ const Navbar = () => {
 
       {/* Desktop Menu */}
       <nav className="hidden sm:flex text-gray-300 h-full">
-        <NavLink className="main-nav-link" to="/">
-          Groceries
-        </NavLink>
+        {/* <NavLink className="main-nav-link" to="/">
+          Grocery Lists
+        </NavLink> */}
 
-        <div className="main-nav-link relative justify-center group">
+        {/* <div className="main-nav-link relative justify-center group">
           <NavLink to="/recipes">
             <button type="button" className="flex items-center cursor-pointer">
               Recipes <FaChevronDown size={12} className="ml-2 pt-0.5" />
@@ -62,7 +62,7 @@ const Navbar = () => {
 
         <NavLink className="main-nav-link" to="/overview">
           My Dashboard
-        </NavLink>
+        </NavLink> */}
       </nav>
 
       {/* Desktop Auth Buttons */}
@@ -104,7 +104,7 @@ const Navbar = () => {
               }`}
       >
         <ul className="flex flex-col gap-1 px-2 py-3 text-lg">
-          <li>
+          {/* <li>
             <NavLink
               onClick={() => setOpen(false)}
               to="/"
@@ -112,9 +112,9 @@ const Navbar = () => {
             >
               Groceries
             </NavLink>
-          </li>
+          </li> */}
 
-          <li>
+          {/* <li>
             <button
               onClick={() => setIsRecipesOpen((o) => !o)}
               className={`flex w-full items-center justify-between px-4 py-4 rounded-lg 
@@ -150,7 +150,7 @@ const Navbar = () => {
             >
               My Dashboard
             </NavLink>
-          </li>
+          </li> */}
 
           <li className="mt-2 px-4 pb-1">
             {user ? (
