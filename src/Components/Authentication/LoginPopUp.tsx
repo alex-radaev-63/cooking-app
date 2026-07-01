@@ -3,6 +3,9 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useOutsidePopUpClose } from "../../hooks/useOutsidePopUpClose";
 import { useAuth } from "../context/AuthContext";
 
+import { FcGoogle } from "react-icons/fc";
+import SocialButton from "./SocialButton";
+
 interface LoginPopUpProps {
   open: boolean;
   onClose: () => void;
@@ -10,6 +13,7 @@ interface LoginPopUpProps {
 
 const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
   const { logIn } = useAuth();
+  const { signInWithProvider } = useAuth();
 
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
@@ -110,13 +114,25 @@ const LoginPopUp = ({ open, onClose }: LoginPopUpProps) => {
           <div className="flex justify-center">
             <button
               type="submit"
-              disabled={loading || !login.trim() || !password.trim()}
-              className="mt-8 btn-primary px-6 min-h-12"
+              // disabled={loading || !login.trim() || !password.trim()}
+              className="w-full mt-2 btn-primary px-6 min-h-12"
             >
               {loading ? "Logging in..." : "Log In"}
             </button>
           </div>
         </form>
+
+        <div>
+          <div className="mt-10 mb-8 text-center text-slate-400 text-sm">
+            - Or Log In With -
+          </div>
+          <div className="flex justify-center items-center">
+            <SocialButton
+              icon={<FcGoogle size={24} />}
+              onClick={() => signInWithProvider("google")}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

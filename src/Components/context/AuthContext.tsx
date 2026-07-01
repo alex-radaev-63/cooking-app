@@ -3,6 +3,8 @@ import { supabase } from "../../supabase-client";
 import { ZodError } from "zod";
 import { loginSchema } from "../../utils/loginValidation";
 
+type OAuthProvider = "google" | "github" | "apple";
+
 interface AuthContextValue {
   user: any;
   loading: boolean;
@@ -10,6 +12,7 @@ interface AuthContextValue {
     email: string,
     password: string,
   ) => Promise<{ success: boolean; error?: string }>;
+  signInWithProvider: (provider: OAuthProvider) => Promise<void>;
   logOut: () => Promise<void>;
   isLoginOpen: boolean;
   openLogin: () => void;
@@ -75,6 +78,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const signInWithProvider = async (provider: OAuthProvider) => {
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+  };
+
   const logOut = async () => {
     setLoading(true);
     await supabase.auth.signOut();
@@ -91,6 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         loading,
         logIn,
+        signInWithProvider,
         logOut,
         isLoginOpen,
         openLogin,
