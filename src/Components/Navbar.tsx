@@ -1,30 +1,48 @@
 import { NavLink } from "react-router-dom";
-import { FaChevronDown } from "react-icons/fa6";
-import { useState, useEffect } from "react";
-import { FiMenu, FiX } from "react-icons/fi";
-
-import LoginPopUp from "./Authentication/LoginPopUp";
-import RecipesDropdownMenu from "./RecipesDropdownMenu";
+import { useState, useRef, useEffect } from "react";
+import { FiMenu, FiX, FiChevronDown } from "react-icons/fi";
 import { useAuth } from "./context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [isRecipesOpen, setIsRecipesOpen] = useState(false);
-  const [isLoginOpen, setLoginOpen] = useState(false);
+  // const [isRecipesOpen, setIsRecipesOpen] = useState(false);
+  const { user, logOut, openAuth } = useAuth();
 
-  const { user, logOut } = useAuth();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
+
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.email?.split("@")[0] ||
+    "My Profile";
+
+  // useEffect(() => {
+  //   let timeout: ReturnType<typeof setTimeout>;
+
+  //   if (!open) {
+  //     timeout = setTimeout(() => {
+  //       setIsRecipesOpen(false);
+  //     }, 350);
+  //   }
+
+  //   return () => clearTimeout(timeout);
+  // }, [open]);
 
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setProfileOpen(false);
+      }
+    };
 
-    if (!open) {
-      timeout = setTimeout(() => {
-        setIsRecipesOpen(false);
-      }, 350);
-    }
-
-    return () => clearTimeout(timeout);
-  }, [open]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="flex flex-row justify-between items-center h-[60px] p-2 pl-4 m-2 border-0 rounded-xl border-slate-700 bg-slate-800">
@@ -65,21 +83,54 @@ const Navbar = () => {
         </NavLink> */}
       </nav>
 
-      {/* Desktop Auth Buttons */}
+      {/* Desktop user profile */}
       {user ? (
-        <button className="btn-destructive hidden sm:block" onClick={logOut}>
-          Log Out
-        </button>
+        <div className="hidden sm:block relative mr-4" ref={profileRef}>
+          <button
+            onClick={() => setProfileOpen((p) => !p)}
+            className="flex items-center cursor-pointer gap-2 text-gray-200 hover:text-white transition"
+          >
+            <span>{displayName}</span>
+            <FiChevronDown
+              className={`transition-transform ${
+                profileOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {profileOpen && (
+            <div className="absolute right-0 mt-2 p-2 min-w-50 rounded-lg text-gray-400 bg-slate-800 border border-slate-700 shadow-lg overflow-hidden z-50">
+              <button
+                className="w-full text-left px-4 py-2 hover:text-white cursor-pointer"
+                onClick={() => {
+                  setProfileOpen(false);
+                  setOpen(false);
+                  navigate("/households");
+                }}
+              >
+                Manage households
+              </button>
+
+              <button
+                className="w-full text-left px-4 py-2 hover:text-white cursor-pointer"
+                onClick={() => {
+                  setProfileOpen(false);
+                  logOut();
+                }}
+              >
+                Log out
+              </button>
+            </div>
+          )}
+        </div>
       ) : (
         <button
           className="btn-primary hidden sm:block"
-          onClick={() => setLoginOpen(true)}
+          onClick={() => openAuth("login")}
         >
           Log In
         </button>
       )}
-
-      <LoginPopUp open={isLoginOpen} onClose={() => setLoginOpen(false)} />
 
       {/* Mobile Menu Toggle */}
       <button
@@ -154,20 +205,36 @@ const Navbar = () => {
 
           <li className="mt-2 px-4 pb-1">
             {user ? (
-              <button
-                className="btn-destructive bg-slate-700/50 hover:bg-red-500/25 w-full p-2.5"
-                onClick={() => {
-                  logOut();
-                  setOpen(false);
-                }}
-              >
-                Log Out
-              </button>
+              <>
+                <div className="px-4 py-2 text-white font-medium">
+                  {displayName}
+                </div>
+
+                <button
+                  className="w-full p-2.5 text-left hover:bg-slate-700"
+                  onClick={() => {
+                    setOpen(false);
+                    console.log("Manage households");
+                  }}
+                >
+                  Manage households
+                </button>
+
+                <button
+                  className="btn-destructive w-full p-2.5"
+                  onClick={() => {
+                    logOut();
+                    setOpen(false);
+                  }}
+                >
+                  Log Out
+                </button>
+              </>
             ) : (
               <button
                 className="btn-primary w-full p-2.5"
                 onClick={() => {
-                  setLoginOpen(true);
+                  openAuth("login");
                   setOpen(false);
                 }}
               >

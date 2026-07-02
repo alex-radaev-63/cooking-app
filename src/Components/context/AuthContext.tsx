@@ -1,22 +1,32 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { supabase } from "../../supabase-client";
+import type { Session } from "@supabase/supabase-js";
 import { ZodError } from "zod";
 import { loginSchema } from "../../utils/loginValidation";
+import { householdService } from "../../services/householdManageDB";
 
 type OAuthProvider = "google" | "github" | "apple";
 
 interface AuthContextValue {
   user: any;
+  householdId: string | null;
   loading: boolean;
   logIn: (
     email: string,
     password: string,
   ) => Promise<{ success: boolean; error?: string }>;
   signInWithProvider: (provider: OAuthProvider) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    metadata?: { full_name?: string },
+  ) => Promise<{ success: boolean; error?: string; data?: any }>;
   logOut: () => Promise<void>;
-  isLoginOpen: boolean;
-  openLogin: () => void;
-  closeLogin: () => void;
+
+  isAuthOpen: boolean;
+  authMode: "login" | "signup";
+  openAuth: (mode?: "login" | "signup") => void;
+  closeAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -24,20 +34,49 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [householdId, setHouseholdId] = useState<string | null>(null);
+
+  const isHandlingSession = useRef(false);
 
   useEffect(() => {
+    const handleSession = async (session: Session | null) => {
+      if (isHandlingSession.current) return;
+
+      isHandlingSession.current = true;
+
+      try {
+        const currentUser = session?.user ?? null;
+
+        setUser(currentUser);
+
+        if (currentUser) {
+          const householdId = await householdService.getOrCreateHousehold(
+            currentUser.id,
+          );
+
+          setHouseholdId(householdId);
+        } else {
+          setHouseholdId(null);
+        }
+      } catch (error) {
+        console.error("Failed to create/get household:", error);
+      } finally {
+        setLoading(false);
+        isHandlingSession.current = false;
+      }
+    };
+
     // Check session on first load
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+      handleSession(session);
     });
 
     // Listen to auth state changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false); // Make sure loading is false after state change
+        handleSession(session);
       },
     );
 
@@ -51,9 +90,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Frontend validation
       loginSchema.parse({ login: email, password });
 
-      setLoading(true); // Start loading before login
+      setLoading(true);
 
-      // Supabase login
       const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -64,16 +102,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { success: false, error: error.message };
       }
 
-      // Immediately set user so UI updates without waiting for event
+      // Immediately update user
       setUser(data.user);
+
+      // Create/get household and store ID
+      const householdId = await householdService.getOrCreateHousehold(
+        data.user.id,
+      );
+
+      setHouseholdId(householdId);
+
       setLoading(false);
 
       return { success: true };
     } catch (err) {
       setLoading(false);
+
       if (err instanceof ZodError) {
         return { success: false, error: err.issues[0].message };
       }
+
       return { success: false, error: "Unexpected error occurred" };
     }
   };
@@ -87,27 +135,62 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const signUp = async (
+    email: string,
+    password: string,
+    metadata?: { full_name?: string },
+  ) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: metadata?.full_name,
+        },
+      },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  };
+
   const logOut = async () => {
     setLoading(true);
+
     await supabase.auth.signOut();
+
     setUser(null);
+    setHouseholdId(null);
+
     setLoading(false);
   };
 
-  const openLogin = () => setIsLoginOpen(true);
-  const closeLogin = () => setIsLoginOpen(false);
+  const openAuth = (mode: "login" | "signup" = "login") => {
+    setAuthMode(mode);
+    setIsAuthOpen(true);
+  };
+
+  const closeAuth = () => {
+    setIsAuthOpen(false);
+  };
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        householdId,
         loading,
         logIn,
         signInWithProvider,
         logOut,
-        isLoginOpen,
-        openLogin,
-        closeLogin,
+        isAuthOpen,
+        authMode,
+        openAuth,
+        closeAuth,
+        signUp,
       }}
     >
       {children}
@@ -117,6 +200,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+
   return context;
 };

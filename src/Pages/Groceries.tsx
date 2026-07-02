@@ -2,10 +2,10 @@ import { FaPlus } from "react-icons/fa6";
 import { useGroceryContext } from "../Components/context/GroceryContext";
 import GroceryFeed from "../Components/groceries/GroceryFeed";
 import { useAuth } from "../Components/context/AuthContext";
-import LoginPopUp from "../Components/Authentication/LoginPopUp";
+// import LoginPopUp from "../Components/Authentication/LoginPopUp";
 
 const Groceries = () => {
-  const { user, loading, isLoginOpen, openLogin, closeLogin } = useAuth();
+  const { user, loading, openAuth } = useAuth();
   const { createNewList } = useGroceryContext();
 
   if (loading) {
@@ -35,7 +35,7 @@ const Groceries = () => {
             <span className="text-slate-500">
               Please
               <button
-                onClick={openLogin}
+                onClick={() => openAuth("login")}
                 className="underline hover:text-slate-100 mx-1.5 cursor-pointer transition-colors"
               >
                 log in
@@ -45,28 +45,8 @@ const Groceries = () => {
           )}
         </div>
 
-        {/* {!user ? (
-          <div className="flex justify-center">
-            <span className="text-slate-500">
-              Please
-              <button
-                onClick={openLogin}
-                className="underline hover:text-slate-100 mx-1.5 cursor-pointer transition-colors"
-              >
-                log in
-              </button>
-              to see grocery lists
-            </span>
-          </div>
-        ) : (
-          <GroceryFeed />
-        )}*/}
+        {user && <GroceryFeed />}
       </div>
-
-      <GroceryFeed />
-
-      {/* Login popup controlled via AuthContext */}
-      <LoginPopUp open={isLoginOpen} onClose={closeLogin} />
     </div>
   );
 };

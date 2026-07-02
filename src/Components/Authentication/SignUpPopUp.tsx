@@ -1,19 +1,21 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
-import { FcGoogle } from "react-icons/fc";
 import SocialButton from "./SocialButton";
+import { FcGoogle } from "react-icons/fc";
 
-interface LoginPopUpProps {
+interface SignUpPopUpProps {
   onClose: () => void;
-  onSwitchToSignUp: () => void;
+  onSwitchToLogin: () => void;
 }
 
-const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
-  const { logIn, signInWithProvider } = useAuth();
+const SignUpPopUp = ({ onClose, onSwitchToLogin }: SignUpPopUpProps) => {
+  const { signInWithProvider, signUp } = useAuth();
 
-  const [login, setLogin] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,43 +25,65 @@ const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
     setLoading(true);
     setAuthError("");
 
-    const { success, error } = await logIn(login, password);
+    try {
+      const { success, error } = await signUp(email, password, {
+        full_name: fullName,
+      });
 
-    setLoading(false);
-
-    if (success) {
-      onClose();
-    } else {
-      setAuthError(error || "Login failed");
+      if (success) {
+        onClose();
+      } else {
+        setAuthError(error || "Sign up failed");
+      }
+    } catch (err: any) {
+      setAuthError(err.message || "Sign up failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="relative w-full max-w-sm rounded-xl bg-slate-800 p-6 text-white shadow-xl">
       <h2 className="mb-8 text-2xl scale-y-115 font-gluten font-medium text-green-300">
-        Welcome to Yummm
+        Create your account
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Full Name */}
         <div>
-          <label className="label-input">Email</label>
+          <label className="label-input">Full Name</label>
           <input
             type="text"
-            placeholder="you@example.com"
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
+            placeholder="John Doe"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
             className={`input-default ${
               authError ? "input-error" : "input-focus"
             }`}
           />
         </div>
 
+        {/* Email */}
+        <div>
+          <label className="label-input">Email</label>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={`input-default ${
+              authError ? "input-error" : "input-focus"
+            }`}
+          />
+        </div>
+
+        {/* Password */}
         <div>
           <label className="label-input">Password</label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
+              placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={`input-default ${
@@ -78,13 +102,15 @@ const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
 
         {authError && <p className="text-sm text-red-400">{authError}</p>}
 
+        {/* Submit */}
         <button type="submit" className="w-full btn-primary min-h-12">
-          {loading ? "Logging in..." : "Log In"}
+          {loading ? "Creating account..." : "Sign Up"}
         </button>
       </form>
 
+      {/* OAuth */}
       <div className="mt-8 text-center text-slate-400 text-sm">
-        - Or Log In With -
+        - Or Sign Up With -
       </div>
 
       <div className="flex justify-center mt-8">
@@ -94,17 +120,18 @@ const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
         />
       </div>
 
+      {/* Switch */}
       <div className="text-slate-400 text-center mt-8">
-        Don't have an account?{" "}
+        Already have an account?{" "}
         <button
           className="underline hover:text-slate-200 cursor-pointer"
-          onClick={onSwitchToSignUp}
+          onClick={onSwitchToLogin}
         >
-          Sign up with email
+          Log in
         </button>
       </div>
     </div>
   );
 };
 
-export default LoginPopUp;
+export default SignUpPopUp;

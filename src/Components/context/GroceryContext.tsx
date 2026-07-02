@@ -12,7 +12,7 @@ import {
   type GroceryListProps,
 } from "../../services/groceriesManageDB";
 import { produce } from "immer";
-// import { useAuth } from "./AuthContext";
+import { useAuth } from "./AuthContext";
 
 interface GroceryContextType {
   groceryLists: GroceryListProps[];
@@ -38,6 +38,8 @@ interface GroceryContextType {
   deleteList: (listId: string, confirm: boolean) => Promise<void>;
 }
 
+// const householdId = "d97dc919-62c4-41bd-b4be-679aac06fd3b";
+
 const GroceryContext = createContext<GroceryContextType | undefined>(undefined);
 
 export const GroceryProvider = ({ children }: { children: ReactNode }) => {
@@ -53,20 +55,22 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
   }>({});
 
   // Fetch lists once on mount
+  const { user, householdId } = useAuth();
 
-  // const { user } = useAuth();
+  console.log("User:", user);
+  console.log("Household:", householdId);
 
   useEffect(() => {
     async function fetchLists() {
       // Preventing lists fetch if user is not logged in
 
-      // if (!user) {
-      //   setGroceryLists([]);
-      //   return;
-      // }
+      if (!user || !householdId) {
+        setGroceryLists([]);
+        return;
+      }
 
       try {
-        const lists = await groceriesService.getAllLists();
+        const lists = await groceriesService.getAllLists(householdId);
 
         // Sort descending by created_at or date
         const sorted = lists.sort((a, b) => {
@@ -104,7 +108,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     }
 
     fetchLists();
-  }, []);
+  }, [user, householdId]);
 
   // Setters for saving and errors by list id
   const setIsSavingList = (listId: string, value: boolean) => {
@@ -116,6 +120,8 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const createNewList = async () => {
+    if (!householdId) return;
+
     const hasEmptyList = groceryLists.some(
       (list) => list.items.length === 0 && list.recipes.length === 0,
     );
@@ -129,6 +135,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
 
     const formattedDate = format(new Date(), "MMMM d, yyyy");
     const newList: Omit<GroceryListProps, "id"> = {
+      household_id: householdId,
       date: formattedDate,
       items: [],
       recipes: [],
@@ -202,6 +209,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
       // Save updated list to DB immediately with fresh state
       groceriesService
         .updateList(listId, {
+          household_id: updated[idx].household_id,
           date: updated[idx].date,
           items: updated[idx].items,
           recipes: updated[idx].recipes,
@@ -316,6 +324,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
 
       groceriesService
         .updateList(listId, {
+          household_id: updated[idx].household_id,
           date: updated[idx].date,
           items: updatedItems ?? updated[idx].items,
           recipes: updated[idx].recipes,
