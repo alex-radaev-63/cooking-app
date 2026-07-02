@@ -57,10 +57,10 @@ const Navbar = () => {
       </NavLink>
 
       {/* Desktop Menu */}
-      <nav className="hidden sm:flex text-gray-300 h-full">
-        {/* <NavLink className="main-nav-link" to="/">
+      <nav className="hidden sm:flex items-stretch text-gray-300 h-full">
+        <NavLink className="main-nav-link" to="/">
           Grocery Lists
-        </NavLink> */}
+        </NavLink>
 
         {/* <div className="main-nav-link relative justify-center group">
           <NavLink to="/recipes">
@@ -81,56 +81,56 @@ const Navbar = () => {
         <NavLink className="main-nav-link" to="/overview">
           My Dashboard
         </NavLink> */}
-      </nav>
 
-      {/* Desktop user profile */}
-      {user ? (
-        <div className="hidden sm:block relative mr-4" ref={profileRef}>
+        {/* Desktop user profile */}
+        {user ? (
+          <div className="hidden sm:block relative" ref={profileRef}>
+            <button
+              onClick={() => setProfileOpen((p) => !p)}
+              className="flex h-full px-6 items-center cursor-pointer gap-2 text-gray-200 hover:text-white transition"
+            >
+              <span>{displayName}</span>
+              <FiChevronDown
+                className={`transition-transform ${
+                  profileOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {profileOpen && (
+              <div className="absolute right-0 mt-2 p-2 min-w-50 rounded-lg text-gray-400 bg-slate-800 border border-slate-700 shadow-lg overflow-hidden z-50">
+                <button
+                  className="w-full text-left px-4 py-2 hover:text-white cursor-pointer"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    setOpen(false);
+                    navigate("/households");
+                  }}
+                >
+                  Manage households
+                </button>
+
+                <button
+                  className="w-full text-left px-4 py-2 hover:text-white cursor-pointer"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    logOut();
+                  }}
+                >
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
           <button
-            onClick={() => setProfileOpen((p) => !p)}
-            className="flex items-center cursor-pointer gap-2 text-gray-200 hover:text-white transition"
+            className="btn-primary hidden sm:block"
+            onClick={() => openAuth("login")}
           >
-            <span>{displayName}</span>
-            <FiChevronDown
-              className={`transition-transform ${
-                profileOpen ? "rotate-180" : ""
-              }`}
-            />
+            Log In
           </button>
-
-          {profileOpen && (
-            <div className="absolute right-0 mt-2 p-2 min-w-50 rounded-lg text-gray-400 bg-slate-800 border border-slate-700 shadow-lg overflow-hidden z-50">
-              <button
-                className="w-full text-left px-4 py-2 hover:text-white cursor-pointer"
-                onClick={() => {
-                  setProfileOpen(false);
-                  setOpen(false);
-                  navigate("/households");
-                }}
-              >
-                Manage households
-              </button>
-
-              <button
-                className="w-full text-left px-4 py-2 hover:text-white cursor-pointer"
-                onClick={() => {
-                  setProfileOpen(false);
-                  logOut();
-                }}
-              >
-                Log out
-              </button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <button
-          className="btn-primary hidden sm:block"
-          onClick={() => openAuth("login")}
-        >
-          Log In
-        </button>
-      )}
+        )}
+      </nav>
 
       {/* Mobile Menu Toggle */}
       <button
