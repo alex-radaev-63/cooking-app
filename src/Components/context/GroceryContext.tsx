@@ -6,26 +6,23 @@ import {
   useContext,
   type ReactNode,
 } from "react";
-import {
-  groceriesService,
-  type GroceryItem,
-  type GroceryListProps,
-} from "../../services/groceriesManageDB";
+import { groceriesService } from "../../services/groceriesManageDB";
+import type { GroceryItem, GroceryList } from "../../types/grocery";
 import { produce } from "immer";
 import { useAuth } from "./AuthContext";
 
 interface GroceryContextType {
-  groceryLists: GroceryListProps[];
-  toggleItemChecked: (listId: string, itemId: number) => Promise<void>;
+  groceryLists: GroceryList[];
+  toggleItemChecked: (listId: string, itemId: string) => Promise<void>;
   isEditingList: { [id: string]: boolean };
   setIsEditingList: (
     listId: string,
     value: boolean,
     updatedItems?: GroceryItem[],
   ) => Promise<void>;
-  updateItemName: (listId: string, itemId: number, newName: string) => void;
+  updateItemName: (listId: string, itemId: string, newName: string) => void;
   addItemToList: (listId: string) => void;
-  removeItemFromList: (listId: string, itemId: number) => void;
+  removeItemFromList: (listId: string, itemId: string) => void;
   setTotal: (listId: string, value: number) => void;
 
   isSavingList: { [id: string]: boolean };
@@ -43,7 +40,7 @@ interface GroceryContextType {
 const GroceryContext = createContext<GroceryContextType | undefined>(undefined);
 
 export const GroceryProvider = ({ children }: { children: ReactNode }) => {
-  const [groceryLists, setGroceryLists] = useState<GroceryListProps[]>([]);
+  const [groceryLists, setGroceryLists] = useState<GroceryList[]>([]);
   const [isEditingList, setIsEditingListState] = useState<{
     [id: string]: boolean;
   }>({});
@@ -134,7 +131,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const formattedDate = format(new Date(), "MMMM d, yyyy");
-    const newList: Omit<GroceryListProps, "id"> = {
+    const newList: Omit<GroceryList, "id"> = {
       household_id: householdId,
       date: formattedDate,
       items: [],
@@ -196,7 +193,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     groceryLists.findIndex((list) => list.id === listId);
 
   // Check or uncheck grocery items
-  const toggleItemChecked = async (listId: string, itemId: number) => {
+  const toggleItemChecked = async (listId: string, itemId: string) => {
     const idx = findListIndex(listId);
     if (idx === -1) return;
 
@@ -223,7 +220,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const updateItemName = (listId: string, itemId: number, newName: string) => {
+  const updateItemName = (listId: string, itemId: string, newName: string) => {
     const idx = findListIndex(listId);
     if (idx === -1) return;
 
@@ -242,13 +239,8 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     setGroceryLists((prev) => {
       const updated = produce(prev, (draft) => {
         const currentItems = draft[idx].items;
-        const nextId =
-          currentItems.length > 0
-            ? Math.max(...currentItems.map((item) => item.id)) + 1
-            : 1;
-
         currentItems.push({
-          id: nextId,
+          id: crypto.randomUUID(),
           name: "",
           checked: false,
         });
@@ -258,7 +250,7 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const removeItemFromList = (listId: string, itemId: number) => {
+  const removeItemFromList = (listId: string, itemId: string) => {
     const idx = findListIndex(listId);
     if (idx === -1) return;
 

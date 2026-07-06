@@ -1,10 +1,10 @@
-import type { GroceryItem as GroceryItemType } from "../../data/groceryData";
+import type { GroceryItem } from "../../types/grocery";
 import { useGroceryContext } from "../context/GroceryContext";
 
 import { IoClose } from "react-icons/io5";
 
 interface Props {
-  item: GroceryItemType;
+  item: GroceryItem;
   listId: string; // changed from listIndex:number to listId:string
 }
 

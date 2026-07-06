@@ -7,16 +7,10 @@ import {
 } from "react-icons/fa6";
 import { useGroceryContext } from "../context/GroceryContext";
 import { useAuth } from "../context/AuthContext";
+import type { GroceryList } from "../../types/grocery";
+import { reconcileItems } from "../../utils/reconcileItems";
 
-interface Props {
-  id: string;
-  date: string;
-  items: { id: number; name: string; checked: boolean }[];
-  recipes: string[];
-  total: number | null;
-}
-
-const GroceryList = ({ id, date, items, total }: Props) => {
+const GroceryList = ({ id, date, items, total }: GroceryList) => {
   const {
     isEditingList,
     setIsEditingList,
@@ -52,16 +46,9 @@ const GroceryList = ({ id, date, items, total }: Props) => {
     const lines = editText
       .split("\n")
       .map((line) => line.trim())
-      .filter((line) => line !== "");
+      .filter(Boolean);
 
-    const newItems = lines.map((name, index) => {
-      const oldItem = items.find((item) => item.name === name);
-      return {
-        id: oldItem?.id ?? index + 1,
-        name,
-        checked: oldItem?.checked ?? false,
-      };
-    });
+    const newItems = reconcileItems(items, lines);
 
     await setIsEditingList(id, false, newItems);
   };

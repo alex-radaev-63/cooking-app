@@ -1,28 +1,12 @@
 import { supabase } from "../supabase-client";
-
-
-export interface GroceryItem {
-  id: number;
-  name: string;
-  checked: boolean;
-}
-
-export interface GroceryListProps {
-  id?: string; // DB row uuid
-  household_id: string;
-  date: string;
-  items: GroceryItem[];
-  recipes: string[];
-  created_at?: string;
-  total: number | null;
-}
+import type { GroceryList } from "../types/grocery";
 
 const TABLE_NAME = 'grocery_lists';
 
 export const groceriesService = {
 
     // Fetch grocery lists from Supabase
-    async getAllLists(householdId: string): Promise<GroceryListProps[]> {
+    async getAllLists(householdId: string): Promise<GroceryList[]> {
     const { data, error } = await supabase
       .from(TABLE_NAME)
       .select(
@@ -42,7 +26,7 @@ export const groceriesService = {
   // Update a grocery list row by id with the full list data
   async updateList(
     listId: string, 
-    updatedList: Omit<GroceryListProps, 'id' | 'created_at'>
+    updatedList: Omit<GroceryList, 'id' | 'created_at'>
   ) {
       const { data, error } = await supabase
         .from(TABLE_NAME)
@@ -64,7 +48,7 @@ export const groceriesService = {
     },
 
   // Create a new grocery list, returns the created row with id
-  async createList(newList: Omit<GroceryListProps, 'id'>): Promise<GroceryListProps> {
+  async createList(newList: Omit<GroceryList, 'id'>): Promise<GroceryList> {
     const { data, error } = await supabase
       .from(TABLE_NAME)
       .insert({
