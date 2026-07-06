@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../Components/context/AuthContext";
 import InvitePopUp from "../Components/Invites/InvitePopUp";
+import { inviteManageDB } from "../services/inviteManageDB";
 
 const ManageHouseholds = () => {
   const { user } = useAuth();
@@ -73,7 +74,7 @@ const ManageHouseholds = () => {
                 setInviteOpen(true);
               }}
             >
-              Send Invite
+              + Invite
             </button>
           </div>
         ))}
@@ -87,6 +88,7 @@ const ManageHouseholds = () => {
             setInviteOpen(false);
             setSelectedHouseholdId(null);
           }}
+          onSend={inviteManageDB.sendInvite}
         />
       )}
     </>

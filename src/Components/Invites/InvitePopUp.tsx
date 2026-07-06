@@ -6,7 +6,7 @@ interface InvitePopUpProps {
   open: boolean;
   householdId: string;
   onClose: () => void;
-  onSend?: (householdId: string, email: string) => Promise<void> | void;
+  onSend: (householdId: string, email: string[]) => Promise<void>;
 }
 
 const InvitePopUp = ({
@@ -38,12 +38,20 @@ const InvitePopUp = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email.trim()) return;
+    if (!email.trim()) {
+      setMessage("Please enter at least one email.");
+      return;
+    }
 
     setLoading(true);
 
     try {
-      await onSend?.(householdId, email);
+      const emails = email
+        .split(",")
+        .map((e) => e.trim().toLowerCase())
+        .filter(Boolean);
+
+      await onSend(householdId, emails);
 
       setMessage("Invitation sent!");
       setEmail("");
@@ -78,7 +86,6 @@ const InvitePopUp = ({
             <label className="label-input">Email address</label>
 
             <input
-              type="email"
               placeholder="friend@example.com"
               value={email}
               onChange={(e) => {
@@ -98,7 +105,7 @@ const InvitePopUp = ({
           </button>
 
           {message && (
-            <p className="text-center text-sm text-green-400">{message}</p>
+            <p className="text-center text text-green-300">{message}</p>
           )}
         </form>
       </div>
