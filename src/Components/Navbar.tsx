@@ -44,6 +44,11 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const resetNavigation = async () => {
+    await logOut();
+    navigate("/", { replace: true });
+  };
+
   return (
     <header className="flex flex-row justify-between items-center h-[60px] p-2 pl-4 m-2 border-0 rounded-xl border-slate-700 bg-slate-800">
       <NavLink to="/">
@@ -57,7 +62,7 @@ const Navbar = () => {
       </NavLink>
 
       {/* Desktop Menu */}
-      <nav className="hidden sm:flex items-stretch text-gray-300 h-full">
+      <nav className="hidden sm:flex gap-4 items-stretch text-gray-300 h-full">
         <NavLink className="main-nav-link" to="/">
           Grocery Lists
         </NavLink>
@@ -115,6 +120,7 @@ const Navbar = () => {
                   onClick={() => {
                     setProfileOpen(false);
                     logOut();
+                    resetNavigation();
                   }}
                 >
                   Log out
@@ -148,7 +154,7 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <nav
         className={`absolute z-999 inset-x-0 top-[72px]
-              mx-2 overflow-hidden rounded-xl border border-slate-700 bg-slate-800
+              mx-2 overflow-hidden rounded-xl shadow-2xl border border-slate-700 bg-slate-800
               text-gray-300 transition-[max-height] duration-350 ease-in
               sm:hidden ${
                 open ? "max-h-screen" : "max-h-0 border-0 duration-350 ease-out"
@@ -191,48 +197,49 @@ const Navbar = () => {
             >
               <RecipesDropdownMenu />
             </div>
-          </li>
+          </li>*/}
 
           <li>
-            <NavLink
-              onClick={() => setOpen(false)}
-              to="/overview"
-              className="block px-4 py-4"
+            <button
+              className="main-nav-link w-full"
+              onClick={() => {
+                setOpen(false);
+                navigate("/");
+              }}
             >
-              My Dashboard
-            </NavLink>
-          </li> */}
+              Grocery Lists
+            </button>
+          </li>
 
-          <li className="mt-2 px-4 pb-1">
+          {user && (
+            <li>
+              <button
+                className="main-nav-link w-full"
+                onClick={() => {
+                  setOpen(false);
+                  navigate("/households");
+                }}
+              >
+                Manage households
+              </button>
+            </li>
+          )}
+
+          <li className="mt-8 mb-4">
             {user ? (
-              <>
-                <div className="px-4 py-2 text-white font-medium">
-                  {displayName}
-                </div>
-
-                <button
-                  className="w-full p-2.5 text-left hover:bg-slate-700"
-                  onClick={() => {
-                    setOpen(false);
-                    console.log("Manage households");
-                  }}
-                >
-                  Manage households
-                </button>
-
-                <button
-                  className="btn-destructive w-full p-2.5"
-                  onClick={() => {
-                    logOut();
-                    setOpen(false);
-                  }}
-                >
-                  Log Out
-                </button>
-              </>
+              <button
+                className="btn-destructive-primary w-full"
+                onClick={() => {
+                  logOut();
+                  setOpen(false);
+                  resetNavigation();
+                }}
+              >
+                Log Out
+              </button>
             ) : (
               <button
-                className="btn-primary w-full p-2.5"
+                className="btn-primary w-full"
                 onClick={() => {
                   openAuth("login");
                   setOpen(false);

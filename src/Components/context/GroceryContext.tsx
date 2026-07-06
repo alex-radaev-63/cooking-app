@@ -59,17 +59,18 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     async function fetchLists() {
-      // Preventing lists fetch if user is not logged in
-
+      // 1. If no auth → clear state and exit
       if (!user || !householdId) {
         setGroceryLists([]);
+        setIsEditingListState({});
+        setIsSavingListState({});
+        setSaveErrorsState({});
         return;
       }
 
       try {
         const lists = await groceriesService.getAllLists(householdId);
 
-        // Sort descending by created_at or date
         const sorted = lists.sort((a, b) => {
           const dateA = new Date(a.created_at || a.date).getTime();
           const dateB = new Date(b.created_at || b.date).getTime();
@@ -78,17 +79,16 @@ export const GroceryProvider = ({ children }: { children: ReactNode }) => {
 
         setGroceryLists(sorted);
 
-        // Initialize per-list states
-        const editing = sorted.reduce(
+        const editingState = sorted.reduce(
           (acc, list) => {
             if (list.id) acc[list.id] = false;
             return acc;
           },
-          {} as { [id: string]: boolean },
+          {} as Record<string, boolean>,
         );
 
-        setIsEditingListState(editing);
-        setIsSavingListState(editing);
+        setIsEditingListState(editingState);
+        setIsSavingListState(editingState);
 
         setSaveErrorsState(
           sorted.reduce(
