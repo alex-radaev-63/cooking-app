@@ -7,10 +7,10 @@ import {
 } from "react-icons/fa6";
 import { useGroceryContext } from "../context/GroceryContext";
 import { useAuth } from "../context/AuthContext";
-import type { GroceryList } from "../../types/grocery";
+import type { GroceryList as GroceryListType } from "../../types/grocery";
 import { reconcileItems } from "../../utils/reconcileItems";
 
-const GroceryList = ({ id, date, items, total }: GroceryList) => {
+const GroceryList = ({ id, date, items, total }: GroceryListType) => {
   const {
     isEditingList,
     setIsEditingList,

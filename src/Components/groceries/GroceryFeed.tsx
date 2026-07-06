@@ -7,7 +7,7 @@ const GroceryFeed = () => {
   return (
     <div className="flex flex-col gap-4">
       {groceryLists.map((list) => (
-        <GroceryList key={list.id} id={list.id!} {...list} />
+        <GroceryList key={list.id} {...list} />
       ))}
     </div>
   );
