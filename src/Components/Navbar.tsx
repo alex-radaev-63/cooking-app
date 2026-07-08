@@ -50,7 +50,7 @@ const Navbar = () => {
 
   // Getting a list of user households
   useEffect(() => {
-    if (!profileOpen || !user) return;
+    if (!user) return;
 
     const fetchHouseholds = async () => {
       try {
@@ -62,7 +62,7 @@ const Navbar = () => {
     };
 
     fetchHouseholds();
-  }, [profileOpen, user]);
+  }, [user]);
 
   const resetNavigation = async () => {
     await logOut();

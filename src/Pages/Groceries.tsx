@@ -72,16 +72,21 @@ const Groceries = () => {
               <div className="relative mt-1" ref={dropdownRef}>
                 <button
                   onClick={() => setHouseholdOpen((prev) => !prev)}
-                  className="flex items-center gap-1 text-sm text-gray-400 cursor-pointer"
+                  className="flex flex-wrap pr-4 text-sm text-gray-400 cursor-pointer"
                 >
-                  Current group:
-                  <span className="text-gray-200">{currentHousehold.name}</span>
-                  <FiChevronDown
-                    size={14}
-                    className={`transition-transform ${
-                      householdOpen ? "rotate-180" : ""
-                    }`}
-                  />
+                  <span>Current group:&nbsp;</span>
+
+                  <div className="flex gap-1 items-center">
+                    <span className="text-gray-200">
+                      {currentHousehold.name}
+                    </span>
+                    <FiChevronDown
+                      size={14}
+                      className={`transition-transform ${
+                        householdOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
                 </button>
 
                 {householdOpen && (
@@ -120,7 +125,7 @@ const Groceries = () => {
                 hover:bg-slate-700 hover:cursor-pointer transition-all ease-out duration-300"
             >
               <FaPlus size={14} className="mr-1.5 mt-0.5" />
-              New List
+              New&nbsp;List
             </button>
           ) : (
             <span className="text-slate-500">
