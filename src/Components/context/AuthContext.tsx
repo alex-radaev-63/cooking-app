@@ -3,13 +3,14 @@ import { supabase } from "../../supabase-client";
 import type { Session } from "@supabase/supabase-js";
 import { ZodError } from "zod";
 import { loginSchema } from "../../utils/loginValidation";
-import { householdService } from "../../services/householdManageDB";
+import { householdManageDB } from "../../services/householdManageDB";
 
 type OAuthProvider = "google" | "github" | "apple";
 
 interface AuthContextValue {
   user: any;
   householdId: string | null;
+  selectHousehold: (id: string) => void;
   loading: boolean;
   logIn: (
     email: string,
@@ -40,6 +41,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const isHandlingSession = useRef(false);
 
+  const selectHousehold = (id: string) => {
+    setHouseholdId(id);
+    localStorage.setItem("activeHouseholdId", id);
+  };
+
   useEffect(() => {
     const handleSession = async (session: Session | null) => {
       if (isHandlingSession.current) return;
@@ -52,11 +58,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(currentUser);
 
         if (currentUser) {
-          const householdId = await householdService.getOrCreateHousehold(
-            currentUser.id,
-          );
+          const defaultHouseholdId =
+            await householdManageDB.getOrCreateHousehold(currentUser.id);
 
-          setHouseholdId(householdId);
+          const savedHouseholdId = localStorage.getItem("activeHouseholdId");
+
+          setHouseholdId(savedHouseholdId ?? defaultHouseholdId);
         } else {
           setHouseholdId(null);
         }
@@ -106,7 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
 
       // Create/get household and store ID
-      const householdId = await householdService.getOrCreateHousehold(
+      const householdId = await householdManageDB.getOrCreateHousehold(
         data.user.id,
       );
 
@@ -179,6 +186,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         user,
         householdId,
+        selectHousehold,
         loading,
         logIn,
         signInWithProvider,

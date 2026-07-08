@@ -1,13 +1,16 @@
 import { NavLink } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { FiMenu, FiX, FiChevronDown } from "react-icons/fi";
+import { FiMenu, FiX, FiChevronDown, FiCheck } from "react-icons/fi";
 import { useAuth } from "./context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { householdManageDB } from "../services/householdManageDB";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   // const [isRecipesOpen, setIsRecipesOpen] = useState(false);
-  const { user, logOut, openAuth } = useAuth();
+  const { user, logOut, openAuth, householdId, selectHousehold } = useAuth();
+
+  const [households, setHouseholds] = useState<any[]>([]);
 
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
@@ -30,6 +33,7 @@ const Navbar = () => {
   //   return () => clearTimeout(timeout);
   // }, [open]);
 
+  // Closing profile dropdown on clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -43,6 +47,22 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Getting a list of user households
+  useEffect(() => {
+    if (!profileOpen || !user) return;
+
+    const fetchHouseholds = async () => {
+      try {
+        const data = await householdManageDB.getUserHouseholds(user.id);
+        setHouseholds(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchHouseholds();
+  }, [profileOpen, user]);
 
   const resetNavigation = async () => {
     await logOut();
@@ -62,7 +82,7 @@ const Navbar = () => {
       </NavLink>
 
       {/* Desktop Menu */}
-      <nav className="hidden sm:flex gap-4 items-stretch text-gray-300 h-full">
+      <nav className="hidden sm:flex gap-0 items-stretch text-gray-300 h-full">
         <NavLink className="main-nav-link" to="/">
           Grocery Lists
         </NavLink>
@@ -103,7 +123,40 @@ const Navbar = () => {
             </button>
 
             {profileOpen && (
-              <div className="absolute right-0 mt-2 p-2 min-w-50 rounded-lg text-gray-400 bg-slate-800 border border-slate-700 shadow-lg overflow-hidden z-50">
+              <div className="absolute right-0 mt-2 p-2 min-w-60 rounded-lg text-gray-400 bg-slate-800 border border-slate-700 shadow-lg overflow-hidden z-50">
+                <div className="px-4 py-2 text-xs uppercase text-gray-500">
+                  Groups
+                </div>
+
+                {households.map((household) => {
+                  const isActive = household.id === householdId;
+
+                  console.log({
+                    householdId,
+                    household,
+                    isActive,
+                  });
+
+                  return (
+                    <button
+                      key={household.id}
+                      className={`w-full flex items-center justify-between text-left px-4 py-2 rounded hover:text-white cursor-pointer transition ${
+                        isActive ? "text-white bg-slate-700" : ""
+                      }`}
+                      onClick={() => {
+                        selectHousehold(household.id);
+                        setProfileOpen(false);
+                      }}
+                    >
+                      <span>{household.name}</span>
+
+                      {isActive && <FiCheck size={16} />}
+                    </button>
+                  );
+                })}
+
+                <div className="border-t border-slate-700 my-2 mx-4" />
+
                 <button
                   className="w-full text-left px-4 py-2 hover:text-white cursor-pointer"
                   onClick={() => {
@@ -160,7 +213,7 @@ const Navbar = () => {
                 open ? "max-h-screen" : "max-h-0 border-0 duration-350 ease-out"
               }`}
       >
-        <ul className="flex flex-col gap-1 px-2 py-3 text-lg">
+        <ul className="flex flex-col gap-1 px-4 py-3 text-lg">
           {/* <li>
             <NavLink
               onClick={() => setOpen(false)}
@@ -198,6 +251,36 @@ const Navbar = () => {
               <RecipesDropdownMenu />
             </div>
           </li>*/}
+          {user && (
+            <li>
+              <div className="px-4 py-2 text-xs uppercase text-gray-500">
+                Groups
+              </div>
+
+              {households.map((household) => {
+                const isActive = household.id === householdId;
+
+                return (
+                  <button
+                    key={household.id}
+                    className={`main-nav-link w-full mb-1 justify-between **:${
+                      isActive ? "text-white bg-slate-700" : "hover:text-white"
+                    }`}
+                    onClick={() => {
+                      selectHousehold(household.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <span>{household.name}</span>
+
+                    {isActive && <FiCheck size={16} />}
+                  </button>
+                );
+              })}
+
+              <div className="border-t border-slate-700 my-2 mx-4" />
+            </li>
+          )}
 
           <li>
             <button

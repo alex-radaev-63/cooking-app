@@ -1,6 +1,6 @@
 import { supabase } from "../supabase-client";
 
-export const householdService = {
+export const householdManageDB = {
 
   async getOrCreateHousehold(userId: string) {
     
@@ -9,6 +9,7 @@ export const householdService = {
       .from("household_members")
       .select("household_id")
       .eq("user_id", userId)
+      .limit(1)
       .maybeSingle();
 
     if (membershipError) {
@@ -74,8 +75,51 @@ export const householdService = {
     if (memberError) {
       throw memberError;
     }
-
-
     return household.id;
   },
+
+  async getUserHouseholds(userId: string) {
+    const { data, error } = await supabase
+      .from("household_members")
+      .select(
+        `
+          role,
+          household:households (
+            id,
+            name,
+            created_at
+          )
+        `,
+      )
+      .eq("user_id", userId);
+
+    if (error) {
+      throw error;
+    }
+
+    return data.map((row) => ({
+      ...row.household,
+      role: row.role,
+    }));
+  },
+
+  async renameHousehold (householdId: string, name: string) {
+      const trimmedName = name.trim();
+  
+      if (!trimmedName) {
+        throw new Error("Household name cannot be empty.");
+      }
+  
+      const { data, error } = await supabase
+        .from("households")
+        .update({ name: trimmedName })
+        .eq("id", householdId)
+        .select()
+        .single();
+  
+      if (error) throw error;
+  
+      return data;
+  },
+
 };

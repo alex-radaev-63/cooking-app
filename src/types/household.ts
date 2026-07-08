@@ -9,3 +9,10 @@ export interface Invite {
   status: "pending" | "accepted" | "declined";
   created_at: string;
 };
+
+export interface Household {
+  id: string;
+  name: string;
+  created_at: string;
+  role: string;
+}
