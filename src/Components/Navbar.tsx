@@ -70,9 +70,9 @@ const Navbar = () => {
   };
 
   return (
-    <header className="flex flex-row justify-between items-center h-[60px] p-2 pl-4 m-2 border-0 rounded-xl border-slate-700 bg-slate-800">
+    <header className="flex flex-row justify-between items-center h-[60px] p-2 pl-4 border-b-1 border-[var(--color-outline)] bg-[var(--color-card-bg)]">
       <NavLink to="/">
-        <div className="flex h-8 text-green-300 font-gluten font-medium text-4xl">
+        <div className="flex h-8 text-[var(--color-primary)] font-gluten font-medium text-4xl">
           <span className="text-4xl">
             Yum
             <span className="text-3xl">m</span>
@@ -82,7 +82,7 @@ const Navbar = () => {
       </NavLink>
 
       {/* Desktop Menu */}
-      <nav className="hidden sm:flex gap-0 items-stretch text-gray-300 h-full">
+      <nav className="hidden sm:flex gap-0 items-stretch h-full">
         <NavLink className="main-nav-link" to="/">
           Grocery Lists
         </NavLink>
@@ -109,10 +109,10 @@ const Navbar = () => {
 
         {/* Desktop user profile */}
         {user ? (
-          <div className="hidden sm:block relative" ref={profileRef}>
+          <div className="block relative" ref={profileRef}>
             <button
               onClick={() => setProfileOpen((p) => !p)}
-              className="flex h-full px-6 items-center cursor-pointer gap-2 text-gray-200 hover:text-white transition"
+              className="flex h-full px-6 items-center cursor-pointer gap-2 text-[var(--color-text)]/85 hover:text-[var(--color-text)]/100 transition"
             >
               <span>{displayName}</span>
               <FiChevronDown
@@ -191,18 +191,26 @@ const Navbar = () => {
         )}
       </nav>
 
-      {/* Mobile Menu Toggle */}
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="sm:hidden p-2 hover:cursor-pointer"
-        aria-label="Open main menu"
-      >
-        {open ? (
-          <FiX size={24} className="text-white" />
-        ) : (
-          <FiMenu size={24} className="text-white" />
+      <div className="flex sm:hidden justify-end items-center">
+        {user && (
+          <div className="flex sm:hidden h-full px-6 items-center gap-2 transition">
+            {displayName}
+          </div>
         )}
-      </button>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className="sm:hidden p-2 pr-4 hover:cursor-pointer text-[var(--color-text)]"
+          aria-label="Open main menu"
+        >
+          {open ? (
+            <FiX size={24} className="" />
+          ) : (
+            <FiMenu size={24} className="" />
+          )}
+        </button>
+      </div>
 
       {/* Mobile Menu */}
       <nav

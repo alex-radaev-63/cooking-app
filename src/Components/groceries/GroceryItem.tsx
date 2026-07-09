@@ -28,9 +28,11 @@ const GroceryItem = ({ item, listId }: Props) => {
             type="checkbox"
             checked={item.checked}
             onChange={() => toggleItemChecked(listId, item.id)}
-            className="accent-green-300 min-h-5 min-w-5"
+            className="bg-slate-500 min-h-5 min-w-5"
           />
-          <span className={item.checked ? "text-slate-500" : ""}>
+          <span
+            className={item.checked ? "text-[var(--color-text-secondary)]" : ""}
+          >
             {item.name}
           </span>
         </label>

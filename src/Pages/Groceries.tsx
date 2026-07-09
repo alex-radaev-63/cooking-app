@@ -64,7 +64,7 @@ const Groceries = () => {
       <div className="flex flex-col gap-8">
         <div className="flex flex-row justify-between min-h-10 items-end">
           <div>
-            <h1 className="text-[28px] font-medium text-white">
+            <h1 className="text-[28px] font-bold text-[var(--color-text)]">
               Grocery Lists
             </h1>
 
@@ -72,14 +72,12 @@ const Groceries = () => {
               <div className="relative mt-1" ref={dropdownRef}>
                 <button
                   onClick={() => setHouseholdOpen((prev) => !prev)}
-                  className="flex flex-wrap pr-4 text-sm text-gray-400 cursor-pointer"
+                  className="flex flex-wrap pr-4 text-smcursor-pointer text-gray-500"
                 >
                   <span>Current group:&nbsp;</span>
 
                   <div className="flex gap-1 items-center">
-                    <span className="text-gray-200">
-                      {currentHousehold.name}
-                    </span>
+                    <span className="">{currentHousehold.name}</span>
                     <FiChevronDown
                       size={14}
                       className={`transition-transform ${
@@ -120,9 +118,9 @@ const Groceries = () => {
           {user ? (
             <button
               onClick={createNewList}
-              className="flex items-center min-h-10 text-gray-200 gap-1 rounded-lg 
-                border border-slate-700 bg-slate-800 px-3 py-2 text-sm 
-                hover:bg-slate-700 hover:cursor-pointer transition-all ease-out duration-300"
+              className="flex items-center min-h-10 gap-1 rounded-xl 
+                bg-[var(--color-primary)] text-white px-5 py-2 text-sm 
+                hover:bg-[var(--color-primary-dark)] hover:cursor-pointer transition-all ease-out duration-300"
             >
               <FaPlus size={14} className="mr-1.5 mt-0.5" />
               New&nbsp;List

@@ -1,8 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Gluten:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 
-html {
-    background-color: var(--color-slate-900);
+:root {
+    --color-outline: #eef0f5;
+    --color-page-bg: #F9FAFB;
+    --color-card-bg: #fff;
+    --color-text-primary:#323232;
+    --color-text-secondary: #6B7280;
+    --color-primary: #3ca44c;
+    --color-primary-dark: #238332;
+
+    --dropshadow-card:
+}
+
+html, body {
+  font-family: "Inter", Helvetica, Arial, sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-page-bg);
 }
 
 a, button {
@@ -11,12 +27,13 @@ a, button {
 
 @theme {
     --font-gluten:'Gluten', cursive;
+    --shadow-card: 0 8px 16px 0 rgba(0,0,0,0.05);
 }
 
 @layer components {
     .main-nav-link {
-        @apply  flex min-h-12 sm:min-h-auto px-4 items-center rounded-lg bg-none hover:bg-slate-700 
-         transition-all duration-200 ease-out;
+        @apply  flex font-medium min-h-12 sm:min-h-auto px-4 items-center rounded-lg bg-none hover:bg-[var(--color-primary)]
+         transition-all duration-200 ease-out hover:text-white;
     }
 
     .recipe-menu-dropdown {

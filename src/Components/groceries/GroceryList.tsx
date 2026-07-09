@@ -61,40 +61,58 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-8 rounded-xl border border-slate-700 bg-slate-800 px-6 py-5 text-white">
+      <div className="flex flex-col  gap-4 shadow-card rounded-xl bg-[var(--color-card-bg)] px-6 py-5">
         {/* Top row */}
-        <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-col justify-center">
           <div className="flex flex-row gap-3 items-center">
-            <h3 className="text-xl font-medium">{date}</h3>
+            <h3 className="text-md mt-1 font-semibold text-[var(--color-secondary)]">
+              {date}
+            </h3>
             {isCompleted && (
-              <span className="flex flex-col mt-0.5 pb-0.25 h-[24px] justify-center px-2 text-xs text-green-300 bg-green-300/20 border-[1.5px] border-green-300/50 rounded-lg">
-                completed
+              <span className="flex flex-col mt-0.5 pt-0.5 h-[24px] justify-center px-3 text-xs uppercase font-bold text-[#16A34A] bg-[#DCFCE7] rounded-4xl">
+                complete
               </span>
             )}
           </div>
 
-          {user &&
-            (!isEditingList[id] ? (
+          <div className="flex justify-between items-center">
+            {user && !isEditingList[id] ? (
               <button
                 onClick={() => setIsEditingList(id, true)}
-                className="flex py-2 px-4 text-gray-400 items-center rounded-lg hover:bg-slate-700 hover:text-white cursor-pointer"
+                className="flex py-2 text-md font-medium text-gray-400 items-center hover:text-gray-600 cursor-pointer"
               >
                 <FaPencil size="12px" className="mr-2" />
                 Edit
               </button>
             ) : (
-              <button
-                onClick={() => deleteList(id, true)}
-                className="flex py-2 px-4 text-gray-400 items-center rounded-lg hover:bg-slate-700 hover:text-white cursor-pointer"
-              >
-                <FaTrashCan size="12px" className="mr-2" />
-                Delete List
-              </button>
-            ))}
+              <>
+                <button
+                  onClick={handleSaveEdits}
+                  className="flex py-2 text-md font-medium text-gray-400 items-center hover:text-gray-600 cursor-pointer"
+                  disabled={isSavingList[id]}
+                >
+                  {isSavingList[id] ? "Saving..." : "Save Edits"}
+                </button>
+                {saveErrors[id] && (
+                  <p className="text-red-500 text-sm mt-1">{saveErrors[id]}</p>
+                )}
+              </>
+            )}
+
+            <button
+              onClick={() => deleteList(id, true)}
+              className="flex p-2 mb-1 text-gray-400 items-center rounded-lg hover:bg-gray-200 hover:text-gray-600 cursor-pointer"
+            >
+              <FaTrashCan size="14px" />
+              {/* Delete List */}
+            </button>
+          </div>
         </div>
 
+        <div className="border-t border-[var(--color-outline)]" />
+
         {/* Grocery items */}
-        <div className="flex flex-col relative mb-2 gap-3">
+        <div className="flex flex-col relative my-2 gap-3">
           {!isEditingList[id] ? (
             <>
               <ul className="flex flex-col gap-3">
@@ -107,11 +125,9 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
                       type="checkbox"
                       checked={item.checked}
                       onChange={() => toggleItemChecked(id, item.id)}
-                      className="accent-green-300 min-h-5 min-w-5"
+                      className="accent-[#16A34A] min-h-5 min-w-5"
                     />
-                    <span className={item.checked ? "text-slate-500" : ""}>
-                      {item.name}
-                    </span>
+                    <span className="text-slate-500">{item.name}</span>
                   </label>
                 ))}
               </ul>
@@ -119,7 +135,7 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
               {items.length > 7 && (
                 <button
                   onClick={() => setShowAll(!showAll)}
-                  className="absolute right-4 bottom-0 flex items-center text-slate-300 cursor-pointer"
+                  className="absolute right-4 bottom-0 flex items-center text-[var(--color-text-secondary)] cursor-pointer"
                 >
                   {showAll ? (
                     <>
@@ -138,51 +154,38 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               ref={listitemsRef}
-              className="w-full min-h-48 bg-slate-700 text-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-green-400 focus:text-white resize-none overflow-hidden"
+              className="w-full min-h-48 bg-gray-100 text-[var(--color-text-secondary)] rounded p-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] resize-none overflow-hidden"
               placeholder="Enter grocery items"
               contentEditable
             />
           )}
         </div>
 
+        <div className="border-t border-[var(--color-outline)]" />
+
         {/* Total price of groceries (grocery bill) */}
         <div className="flex flex-row justify-between items-end">
-          <div className="flex flex-col gap-1">
-            <h4 className="text-md text-slate-500">Total</h4>
+          <div className="flex w-full justify-between items-center ">
+            <h4 className="font-semibold text-slate-500">Total</h4>
             <div>
               {isEditingList[id] ? (
                 <input
                   type="number"
                   value={total ?? 0} // default to 0 if total is null
                   onChange={(e) => setTotal(id, parseFloat(e.target.value))}
-                  className="w-[120px] h-[40px] p-1 rounded bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  className="w-[120px] h-[40px] p-1 rounded text-right bg-gray-100 text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-text-secondary)]"
                   step="0.01"
                   min="0"
                 />
               ) : (
-                <span className="text-xl text-white font-medium">
+                <span className="text-xl font-bold">
                   {total !== null ? `$ ${total.toFixed(2)}` : "-"}
                 </span>
               )}
             </div>
           </div>
-
-          {/* Save button */}
-          {isEditingList[id] && (
-            <div className="flex flex-col items-end pt-8">
-              <button
-                onClick={handleSaveEdits}
-                className="btn-primary"
-                disabled={isSavingList[id]}
-              >
-                {isSavingList[id] ? "Saving..." : "Save Edits"}
-              </button>
-              {saveErrors[id] && (
-                <p className="text-red-500 text-sm mt-1">{saveErrors[id]}</p>
-              )}
-            </div>
-          )}
         </div>
+
         {items.length === 0 && !isEditingList[id] && (
           <button
             className="flex flex-row justify-center items-center w-full h-[64px] 
