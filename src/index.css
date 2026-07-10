@@ -7,12 +7,14 @@
     --color-outline: #eef0f5;
     --color-page-bg: #F9FAFB;
     --color-card-bg: #fff;
+
     --color-text-primary:#323232;
     --color-text-secondary: #6B7280;
+
     --color-primary: #3ca44c;
     --color-primary-dark: #238332;
+    --color-primary-light: #DCFCE7;
 
-    --dropshadow-card:
 }
 
 html, body {
@@ -28,12 +30,20 @@ a, button {
 @theme {
     --font-gluten:'Gluten', cursive;
     --shadow-card: 0 8px 16px 0 rgba(0,0,0,0.05);
+
+    --color-primary: var(--color-primary);
+    --color-primary-dark: var(--color-primary-dark);
+    --color-primary-light: var(--color-primary-light);
+
+    --color-text-primary: var(--color-text-primary);
+    --color-text-secondary: var(--color-text-secondary);
 }
 
 @layer components {
     .main-nav-link {
-        @apply  flex font-medium min-h-12 sm:min-h-auto px-4 items-center rounded-lg bg-none hover:bg-[var(--color-primary)]
-         transition-all duration-200 ease-out hover:text-white;
+        @apply  flex font-medium min-h-12 px-4 items-center hover:text-white rounded-lg 
+        bg-none hover:bg-[var(--color-primary)]
+         transition-all duration-250 ease-out;
     }
 
     .recipe-menu-dropdown {
@@ -56,10 +66,11 @@ a, button {
     }
 
     .btn-destructive-primary {
-        @apply flex items-center justify-center min-h-10 sm:min-h-auto px-4 rounded-lg
-          text-red-400 bg-red-500/25 font-medium hover:bg-red-500/35
-            transition-all duration-300 ease-out disabled:bg-slate-700 
-          disabled:border-0 disabled:text-gray-500 disabled:cursor-default;
+        @apply flex items-center justify-center min-h-10 sm:min-h-auto px-4 
+          rounded-lg border border-slate-500 
+          hover:bg-gray-200/75 hover:border-none 
+          disabled:text-gray-500 disabled:cursor-default
+          transition-all duration-250 ease-out;
     }
 
     .btn-destructive-secondary {

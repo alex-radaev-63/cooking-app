@@ -70,7 +70,11 @@ const Navbar = () => {
   };
 
   return (
-    <header className="flex flex-row justify-between items-center h-[60px] p-2 pl-4 border-b-1 border-[var(--color-outline)] bg-[var(--color-card-bg)]">
+    <header
+      className="flex flex-row z-1000 justify-between items-center h-[60px] p-2 pl-4 
+    border-b-1 border-[var(--color-outline)] 
+    bg-[var(--color-card-bg)]"
+    >
       <NavLink to="/">
         <div className="flex h-8 text-[var(--color-primary)] font-gluten font-medium text-4xl">
           <span className="text-4xl">
@@ -123,25 +127,19 @@ const Navbar = () => {
             </button>
 
             {profileOpen && (
-              <div className="absolute right-0 mt-2 p-2 min-w-60 rounded-lg text-gray-400 bg-slate-800 border border-slate-700 shadow-lg overflow-hidden z-50">
-                <div className="px-4 py-2 text-xs uppercase text-gray-500">
+              <div className="absolute right-0 mt-2 p-2 min-w-60 rounded-lg bg-[var(--color-card-bg)] shadow-lg overflow-hidden z-50">
+                <div className="px-4 py-2 text-xs uppercase text-gray-400">
                   Groups
                 </div>
 
                 {households.map((household) => {
                   const isActive = household.id === householdId;
 
-                  console.log({
-                    householdId,
-                    household,
-                    isActive,
-                  });
-
                   return (
                     <button
                       key={household.id}
-                      className={`w-full flex items-center justify-between text-left px-4 py-2 rounded hover:text-white cursor-pointer transition ${
-                        isActive ? "text-white bg-slate-700" : ""
+                      className={`w-full flex items-center mb-1 justify-between text-left px-4 py-2 text-text-primary hover:text-white hover:bg-primary rounded transition-all duration-250 ease-out ${
+                        isActive ? "text-white bg-[var(--color-primary)]" : ""
                       }`}
                       onClick={() => {
                         selectHousehold(household.id);
@@ -155,10 +153,11 @@ const Navbar = () => {
                   );
                 })}
 
-                <div className="border-t border-slate-700 my-2 mx-4" />
+                {/* Divider */}
+                <div className="border-t my-2 border-[var(--color-outline)]" />
 
                 <button
-                  className="w-full text-left px-4 py-2 hover:text-white cursor-pointer"
+                  className="w-full text-left px-4 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
                   onClick={() => {
                     setProfileOpen(false);
                     setOpen(false);
@@ -169,7 +168,7 @@ const Navbar = () => {
                 </button>
 
                 <button
-                  className="w-full text-left px-4 py-2 hover:text-white cursor-pointer"
+                  className="w-full text-left px-4 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
                   onClick={() => {
                     setProfileOpen(false);
                     logOut();
@@ -212,11 +211,22 @@ const Navbar = () => {
         </button>
       </div>
 
+      {/* Mobile Menu Backdrop */}
+      <div
+        onClick={() => setOpen(false)}
+        className={`fixed inset-0 top-[60px] bg-black transition-opacity duration-300 sm:hidden
+            ${
+              open
+                ? "opacity-35 pointer-events-auto z-[998]"
+                : "opacity-0 pointer-events-none"
+            }`}
+      />
+
       {/* Mobile Menu */}
       <nav
-        className={`absolute z-999 inset-x-0 top-[72px]
-              mx-2 overflow-hidden rounded-xl shadow-2xl border border-slate-700 bg-slate-800
-              text-gray-300 transition-[max-height] duration-350 ease-in
+        className={`absolute z-999 inset-x-0 top-[60px]
+              overflow-hidden shadow-xl bg-[var(--color-card-bg)]
+              transition-[max-height] duration-350 ease-in
               sm:hidden ${
                 open ? "max-h-screen" : "max-h-0 border-0 duration-350 ease-out"
               }`}
@@ -259,9 +269,10 @@ const Navbar = () => {
               <RecipesDropdownMenu />
             </div>
           </li>*/}
+
           {user && (
             <li>
-              <div className="px-4 py-2 text-xs uppercase text-gray-500">
+              <div className="px-4 py-2 text-xs uppercase text-gray-400">
                 Groups
               </div>
 
@@ -271,8 +282,10 @@ const Navbar = () => {
                 return (
                   <button
                     key={household.id}
-                    className={`main-nav-link w-full mb-1 justify-between **:${
-                      isActive ? "text-white bg-slate-700" : "hover:text-white"
+                    className={`main-nav-link w-full mb-1 justify-between ${
+                      isActive
+                        ? "text-white bg-[var(--color-primary)]"
+                        : "hover:text-white"
                     }`}
                     onClick={() => {
                       selectHousehold(household.id);
@@ -286,7 +299,7 @@ const Navbar = () => {
                 );
               })}
 
-              <div className="border-t border-slate-700 my-2 mx-4" />
+              <div className="border-t my-2 border-[var(--color-outline)]" />
             </li>
           )}
 

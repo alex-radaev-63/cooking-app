@@ -88,15 +88,15 @@ const Groceries = () => {
                 </button>
 
                 {householdOpen && (
-                  <div className="absolute left-0 mt-2 w-56 p-2 rounded-lg bg-slate-800 border border-slate-700 shadow-lg z-50">
+                  <div className="absolute left-0 mt-2 w-56 p-2 rounded-lg bg-[var(--color-card-bg)] shadow-lg z-50">
                     {households.map((household) => {
                       const isActive = household.id === householdId;
 
                       return (
                         <button
                           key={household.id}
-                          className={`main-nav-link w-full justify-between mb-1 text-slate-400 ${
-                            isActive ? "text-white bg-slate-700" : ""
+                          className={`main-nav-link w-full justify-between mb-1  ${
+                            isActive ? "text-white bg-primary" : ""
                           }`}
                           onClick={() => {
                             selectHousehold(household.id);
