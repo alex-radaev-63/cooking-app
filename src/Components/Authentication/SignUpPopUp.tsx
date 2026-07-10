@@ -43,10 +43,8 @@ const SignUpPopUp = ({ onClose, onSwitchToLogin }: SignUpPopUpProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-sm rounded-xl bg-slate-800 p-6 text-white shadow-xl">
-      <h2 className="mb-8 text-2xl scale-y-115 font-gluten font-medium text-green-300">
-        Create your account
-      </h2>
+    <div className="relative w-full max-w-sm rounded-xl  p-6 bg-[var(--color-card-bg)] shadow-xl">
+      <h2 className="mb-8 text-2xl font-bold">Create your account</h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Full Name */}
@@ -124,7 +122,7 @@ const SignUpPopUp = ({ onClose, onSwitchToLogin }: SignUpPopUpProps) => {
       <div className="text-slate-400 text-center mt-8">
         Already have an account?{" "}
         <button
-          className="underline hover:text-slate-200 cursor-pointer"
+          className="underline hover:text-text-primary cursor-pointer"
           onClick={onSwitchToLogin}
         >
           Log in

@@ -87,8 +87,11 @@ const Navbar = () => {
 
       {/* Desktop Menu */}
       <nav className="hidden sm:flex gap-0 items-stretch h-full">
-        <NavLink className="main-nav-link" to="/">
-          Grocery Lists
+        <NavLink
+          className="flex items-center w-full text-left px-4 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+          to="/"
+        >
+          Grocery&nbsp;Lists
         </NavLink>
 
         {/* <div className="main-nav-link relative justify-center group">
@@ -182,7 +185,7 @@ const Navbar = () => {
           </div>
         ) : (
           <button
-            className="btn-primary hidden sm:block"
+            className="w-full text-left px-4 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
             onClick={() => openAuth("login")}
           >
             Log In
@@ -329,7 +332,7 @@ const Navbar = () => {
             </li>
           )}
 
-          <li className="mt-8 mb-4">
+          <li className={`mt-8 ${!user ? "!mt-4" : ""} mb-4`}>
             {user ? (
               <button
                 className="btn-destructive-primary w-full"
@@ -343,7 +346,7 @@ const Navbar = () => {
               </button>
             ) : (
               <button
-                className="btn-primary w-full"
+                className="btn-destructive-primary w-full"
                 onClick={() => {
                   openAuth("login");
                   setOpen(false);

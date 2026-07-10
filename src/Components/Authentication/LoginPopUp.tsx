@@ -35,8 +35,8 @@ const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-sm rounded-xl bg-slate-800 p-6 text-white shadow-xl">
-      <h2 className="mb-8 text-2xl scale-y-115 font-gluten font-medium text-green-300">
+    <div className="relative w-full max-w-sm rounded-xl bg-[var(--color-card-bg)] p-6 shadow-xl">
+      <h2 className="mb-8 text-2xl font-bold text-text-primary">
         Welcome to Yummm
       </h2>
 
@@ -69,7 +69,7 @@ const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
             <button
               type="button"
               onClick={() => setShowPassword((p) => !p)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-white cursor-pointer"
+              className="absolute right-4 top-4 text-gray-400 hover:text-text-primary"
             >
               {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
             </button>
@@ -97,7 +97,7 @@ const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
       <div className="text-slate-400 text-center mt-8">
         Don't have an account?{" "}
         <button
-          className="underline hover:text-slate-200 cursor-pointer"
+          className="underline hover:text-text-primary cursor-pointer"
           onClick={onSwitchToSignUp}
         >
           Sign up with email

@@ -117,14 +117,16 @@ const ManageHouseholds = () => {
   return (
     <>
       <div className="flex flex-col max-w-[840px] mx-auto p-4 mt-6 gap-4">
-        <h1 className="text-[28px] font-medium text-white">All Groups</h1>
+        <h1 className="text-[28px] font-semibold text-text-primary">
+          All Groups
+        </h1>
 
         {households.map((h) => (
           <div
             key={h.id}
-            className="flex flex-row flex-wrap items-end sm:items-start gap-0 sm:gap-4 rounded-xl border justify-end sm:justify-between border-slate-700 bg-slate-800 px-6 py-5 text-white"
+            className="flex flex-row flex-wrap items-end gap-0 sm:gap-4 rounded-xl justify-end sm:justify-between bg-[var(--color-card-bg)] shadow-card px-6 py-5"
           >
-            <div className="flex flex-col gap-1 w-full sm:w-auto">
+            <div className="flex flex-col gap-1 w-full">
               <div className="flex items-center gap-2">
                 {editingHouseholdId === h.id ? (
                   <>
@@ -150,7 +152,7 @@ const ManageHouseholds = () => {
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => saveHouseholdName(h.id, h.name)}
                     >
-                      Change
+                      Save Changes
                     </button>
                   </>
                 ) : (
@@ -171,55 +173,69 @@ const ManageHouseholds = () => {
                 )}
               </div>
 
-              <p>
-                <span className="text-gray-400">Role:</span> {h.role}
-              </p>
-              <p>
-                <span className="text-gray-400">Created:</span>{" "}
-                {new Date(h.created_at).toLocaleDateString()}
-              </p>
+              {/* Second row */}
+              <div className="flex flex-row flex-wrap w-full justify-between items-end">
+                <div className="flex flex-col gap-1 mb-2">
+                  <p>
+                    <span className="text-gray-400">Role:</span> {h.role}
+                  </p>
+                  <p>
+                    <span className="text-gray-400">Created:</span>{" "}
+                    {new Date(h.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {h.role === "owner" && (
+                  <button
+                    className="flex font-medium items-center gap-2 px-4 h-11 rounded-lg
+                  text-[var(--color-primary)]
+                  hover:bg-[var(--color-primary-light)]
+                  transition"
+                    onClick={() => {
+                      setSelectedHouseholdId(h.id);
+                      setInviteOpen(true);
+                    }}
+                  >
+                    + Invite Members
+                  </button>
+                )}
+
+                {h.role === "editor" && (
+                  <button
+                    className="flex items-center gap-2 px-4 h-11 rounded-lg
+                text-[var(--color-text-secondary)]
+                hover:bg-gray-100
+                hover:text-[var(--color-text)]
+                transition cursor-pointer"
+                    onClick={async () => {
+                      const confirmed = window.confirm(
+                        `Leave "${h.name}"? You will lose access to all shared grocery lists.`,
+                      );
+
+                      if (!confirmed) return;
+
+                      try {
+                        await rolesManageDB.leaveHousehold(h.id);
+                        await fetchHouseholds();
+                      } catch (error) {
+                        console.error(error);
+                      }
+                    }}
+                  >
+                    <TbDoorExit size={18} />
+                    Leave Group
+                  </button>
+                )}
+              </div>
             </div>
-
-            {h.role === "owner" && (
-              <button
-                className="btn-primary w-fit"
-                onClick={() => {
-                  setSelectedHouseholdId(h.id);
-                  setInviteOpen(true);
-                }}
-              >
-                + Invite
-              </button>
-            )}
-
-            {h.role === "editor" && (
-              <button
-                className="btn-secondary gap-2 w-fit"
-                onClick={async () => {
-                  const confirmed = window.confirm(
-                    `Leave "${h.name}"? You will lose access to all shared grocery lists.`,
-                  );
-
-                  if (!confirmed) return;
-
-                  try {
-                    await rolesManageDB.leaveHousehold(h.id);
-                    await fetchHouseholds();
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-              >
-                <TbDoorExit className="mt-0.5" />
-                Leave Group
-              </button>
-            )}
           </div>
         ))}
       </div>
 
       <div className="flex flex-col max-w-[840px] mx-auto p-4 mt-6 gap-4">
-        <h1 className="text-[28px] font-medium text-white">My Invites</h1>
+        <h1 className="text-[28px] font-semibold text-text-primary">
+          My Invites
+        </h1>
 
         {invites.length === 0 ? (
           <div className="text-slate-500">You have no pending invites.</div>
@@ -227,27 +243,33 @@ const ManageHouseholds = () => {
           invites.map((inv) => (
             <div
               key={inv.id}
-              className="flex flex-col sm:flex-row gap-4 rounded-xl border border-slate-700 bg-slate-800 px-6 py-5 text-white sm:justify-between"
+              className="flex flex-row flex-wrap items-end gap-0 sm:gap-4 rounded-xl justify-end sm:justify-between bg-[var(--color-card-bg)] shadow-card px-6 py-5"
             >
-              <div className="flex flex-col gap-1">
-                <h2 className="text-xl font-semibold capitalize mb-4">
+              <div className="flex flex-col gap-1 w-full sm:w-auto">
+                <h2 className="mt-1.5 mb-4 text-xl font-semibold capitalize">
                   {inv.household.name}
                 </h2>
 
-                <p>
-                  <span className="text-slate-400">Invited by:</span>{" "}
-                  {inv.invited_by_name}
-                </p>
+                <div className="flex flex-col gap-1 mb-2">
+                  <p>
+                    <span className="text-gray-400">Invited by:</span>{" "}
+                    {inv.invited_by_name}
+                  </p>
 
-                <p>
-                  <span className="text-slate-400">Sent:</span>{" "}
-                  {new Date(inv.created_at).toLocaleDateString()}
-                </p>
+                  <p>
+                    <span className="text-gray-400">Sent:</span>{" "}
+                    {new Date(inv.created_at).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
 
-              <div className="flex flex-row-reverse sm:flex-row h-full gap-3">
+              <div
+                className={`flex flex-row-reverse 
+                sm:flex-row items-end gap-3 w-full sm:w-auto
+                mt-4 sm:mt-0`}
+              >
                 <button
-                  className="btn-primary w-full sm:w-auto"
+                  className="btn-secondary w-full sm:w-auto"
                   onClick={async () => {
                     try {
                       await inviteManageDB.acceptInvite(inv.id);

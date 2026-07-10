@@ -68,18 +68,16 @@ const InvitePopUp = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
       <div
         ref={popupRef}
-        className="relative w-full max-w-sm rounded-xl bg-slate-800 p-6 text-white shadow-xl"
+        className="relative w-full max-w-sm rounded-xl bg-[var(--color-card-bg)] p-6 shadow-xl"
       >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-white"
+          className="absolute top-3 right-3 text-gray-400 hover:text-text-primary"
         >
           <FiX size={22} />
         </button>
 
-        <h2 className="mb-8 text-2xl font-gluten font-medium text-green-300 scale-y-115">
-          Invite to Household
-        </h2>
+        <h2 className="mb-8 text-2xl font-semibold">Invite to Household</h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -99,13 +97,13 @@ const InvitePopUp = ({
           <button
             type="submit"
             disabled={loading || !email.trim()}
-            className="btn-primary w-full min-h-12"
+            className="btn-secondary w-full min-h-12"
           >
             {loading ? "Sending..." : "Send Invite"}
           </button>
 
           {message && (
-            <p className="text-center text text-green-300">{message}</p>
+            <p className="text-center text text-primary">{message}</p>
           )}
         </form>
       </div>

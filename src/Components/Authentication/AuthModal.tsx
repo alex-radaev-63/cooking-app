@@ -19,7 +19,7 @@ const AuthModal = () => {
       >
         <button
           onClick={closeAuth}
-          className="absolute top-6 right-6 text-gray-400 hover:text-white text-2xl z-10 cursor-pointer"
+          className="absolute top-6 right-6 text-gray-400 hover:text-text-primary text-2xl z-10 cursor-pointer"
           aria-label="Close modal"
         >
           <FiX size={24} />

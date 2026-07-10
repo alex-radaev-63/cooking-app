@@ -176,8 +176,41 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
                       type="checkbox"
                       checked={item.checked}
                       onChange={() => toggleItemChecked(id, item.id)}
-                      className="accent-[#16A34A] min-h-5 min-w-5"
+                      className="
+                        peer
+                        appearance-none
+                        min-h-6 min-w-6
+                        rounded-md
+                        border-[1.5px] border-slate-400
+                        checked:bg-[#16A34A]
+                        checked:border-[#16A34A]
+                        cursor-pointer
+                        relative
+                      "
                     />
+
+                    <svg
+                      className="
+                        pointer-events-none
+                        absolute
+                        hidden
+                        h-4.5 w-4.5
+                        ml-[2.5px]
+                        text-white
+                        peer-checked:block
+                      "
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    >
+                      <path
+                        d="M4 10.5L8 14.5L16 6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+
                     <span className="text-slate-500">{item.name}</span>
                   </label>
                 ))}
