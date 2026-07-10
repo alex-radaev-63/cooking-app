@@ -43,7 +43,7 @@ const SignUpPopUp = ({ onClose, onSwitchToLogin }: SignUpPopUpProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-sm rounded-xl  p-6 bg-[var(--color-card-bg)] shadow-xl">
+    <div className="relative w-full max-w-[95%] sm:max-w-sm m-auto rounded-xl  p-6 bg-[var(--color-card-bg)] shadow-xl">
       <h2 className="mb-8 text-2xl font-bold">Create your account</h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">

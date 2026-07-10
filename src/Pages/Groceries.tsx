@@ -61,7 +61,7 @@ const Groceries = () => {
 
   return (
     <div className="flex flex-col max-w-[600px] mx-auto p-4 mt-6 gap-4">
-      <div className="flex flex-col gap-8">
+      <div className={`flex flex-col ${!user ? "gap-2" : "gap-8"}`}>
         <div className="flex flex-row justify-between min-h-10 items-end">
           <div>
             <h1 className="text-[28px] font-bold text-[var(--color-text)]">
@@ -115,7 +115,7 @@ const Groceries = () => {
             )}
           </div>
 
-          {user ? (
+          {user && (
             <button
               onClick={createNewList}
               className="flex items-center min-h-10 gap-1 rounded-xl 
@@ -125,19 +125,19 @@ const Groceries = () => {
               <FaPlus size={14} className="mr-1.5 mt-0.5" />
               New&nbsp;List
             </button>
-          ) : (
-            <span className="text-slate-500">
-              Please
-              <button
-                onClick={() => openAuth("login")}
-                className="underline hover:text-slate-100 mx-1.5 cursor-pointer transition-colors"
-              >
-                log in
-              </button>
-              to edit grocery lists
-            </span>
           )}
         </div>
+
+        <span className="text-slate-500">
+          Please
+          <button
+            onClick={() => openAuth("login")}
+            className="underline hover:text-slate-100 mx-1.5 cursor-pointer transition-colors"
+          >
+            log in
+          </button>
+          to edit grocery lists
+        </span>
 
         {user && <GroceryFeed />}
       </div>

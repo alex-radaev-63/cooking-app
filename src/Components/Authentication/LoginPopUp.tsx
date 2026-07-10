@@ -35,7 +35,7 @@ const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-sm rounded-xl bg-[var(--color-card-bg)] p-6 shadow-xl">
+    <div className="relative w-full max-w-[95%] sm:max-w-sm m-auto rounded-xl bg-[var(--color-card-bg)] p-6 shadow-xl">
       <h2 className="mb-8 text-2xl font-bold text-text-primary">
         Welcome to Yummm
       </h2>
