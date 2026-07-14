@@ -36,9 +36,7 @@ const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
 
   return (
     <div className="relative w-full max-w-[95%] sm:max-w-sm m-auto rounded-xl bg-[var(--color-card-bg)] p-6 shadow-xl">
-      <h2 className="mb-8 text-2xl font-bold text-text-primary">
-        Welcome to Yummm
-      </h2>
+      <h2 className="mb-8 text-2xl font-bold text-text-primary">Sign In</h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -79,17 +77,18 @@ const LoginPopUp = ({ onClose, onSwitchToSignUp }: LoginPopUpProps) => {
         {authError && <p className="text-sm text-red-400">{authError}</p>}
 
         <button type="submit" className="w-full btn-primary min-h-12">
-          {loading ? "Logging in..." : "Log In"}
+          {loading ? "Signing In..." : "Sign In"}
         </button>
       </form>
 
       <div className="mt-8 text-center text-slate-400 text-sm">
-        - Or Log In With -
+        - Or continue with -
       </div>
 
       <div className="flex justify-center mt-8">
         <SocialButton
           icon={<FcGoogle size={24} />}
+          text="Google"
           onClick={() => signInWithProvider("google")}
         />
       </div>
