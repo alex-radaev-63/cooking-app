@@ -128,16 +128,18 @@ const Groceries = () => {
           )}
         </div>
 
-        <span className="text-slate-500">
-          Please
-          <button
-            onClick={() => openAuth("login")}
-            className="underline hover:text-slate-100 mx-1.5 cursor-pointer transition-colors"
-          >
-            log in
-          </button>
-          to edit grocery lists
-        </span>
+        {!user && (
+          <span className="text-slate-500">
+            Please
+            <button
+              onClick={() => openAuth("login")}
+              className="underline hover:text-text-primary mx-1.5 cursor-pointer transition-colors"
+            >
+              log in
+            </button>
+            to edit grocery lists
+          </span>
+        )}
 
         {user && <GroceryFeed />}
       </div>
