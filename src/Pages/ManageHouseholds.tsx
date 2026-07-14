@@ -1,25 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../Components/context/AuthContext";
-import InvitePopUp from "../Components/Invites/InvitePopUp";
+import InvitePopUp from "../Components/households/InvitePopUp";
 import { inviteManageDB } from "../services/inviteManageDB";
-import type { Invite } from "../types/household";
+import type { Household, Invite } from "../types/household";
 import { TbDoorExit } from "react-icons/tb";
 import { rolesManageDB } from "../services/rolesManageDB";
-import { FaPencil } from "react-icons/fa6";
+import {
+  FaPencil,
+  FaPlus,
+  FaEllipsisVertical,
+  FaTrashCan,
+} from "react-icons/fa6";
 import { householdManageDB } from "../services/householdManageDB";
+import CreateGroupPopUp from "../Components/households/CreateGroupPopUp";
+import DeleteGroupPopUp from "../Components/households/DeleteGroupPopUp";
 
 const ManageHouseholds = () => {
-  const { user } = useAuth();
-  const [households, setHouseholds] = useState<any[]>([]);
+  const { user, selectHousehold } = useAuth();
+  const [households, setHouseholds] = useState<Household[]>([]);
   const [invites, setInvites] = useState<Invite[]>([]);
+
   const [isInviteOpen, setInviteOpen] = useState(false);
+  const [createGroupOpen, setCreateGroupOpen] = useState(false);
+
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+
   const [selectedHouseholdId, setSelectedHouseholdId] = useState<string | null>(
     null,
   );
   const [editingHouseholdId, setEditingHouseholdId] = useState<string | null>(
     null,
   );
+  const [deleteHouseholdId, setDeleteHouseholdId] = useState<string | null>(
+    null,
+  );
+  const [deleteHouseholdName, setDeleteHouseholdName] = useState("");
+
   const [editedName, setEditedName] = useState("");
 
   const startEditing = (id: string, currentName: string) => {
@@ -55,14 +72,41 @@ const ManageHouseholds = () => {
     setEditedName("");
   };
 
-  const fetchHouseholds = async () => {
-    if (!user) return;
+  const fetchHouseholds = async (): Promise<Household[]> => {
+    if (!user) return [];
 
     try {
       const data = await householdManageDB.getUserHouseholds(user.id);
-      setHouseholds(data);
+
+      const rolePriority: Record<string, number> = {
+        owner: 1,
+        editor: 2,
+      };
+
+      const sorted = [...data].sort((a, b) => {
+        const rolePriority: Record<string, number> = {
+          owner: 1,
+          editor: 2,
+        };
+
+        const roleA = rolePriority[a.role] ?? 3;
+        const roleB = rolePriority[b.role] ?? 3;
+
+        if (roleA !== roleB) {
+          return roleA - roleB;
+        }
+
+        return (
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      });
+
+      setHouseholds(sorted);
+
+      return sorted;
     } catch (error) {
       console.error(error);
+      return [];
     }
   };
 
@@ -109,6 +153,64 @@ const ManageHouseholds = () => {
     setInvites(formatted);
   };
 
+  const handleCreateGroup = async (name: string, emails: string[]) => {
+    if (!user) return;
+
+    try {
+      // Create household
+      const household = await householdManageDB.createHousehold(user.id, name);
+
+      // Send invites if members were added
+      if (emails.length > 0) {
+        await inviteManageDB.sendInvite(household.id, emails);
+      }
+
+      // 3. Refresh household list
+      await fetchHouseholds();
+
+      // 4. Switch to newly created household
+      selectHousehold(household.id);
+    } catch (error) {
+      console.error("Failed to create household:", error);
+      throw error;
+    }
+  };
+
+  const handleLeaveGroup = async (householdId: string, name: string) => {
+    const confirmed = window.confirm(
+      `Leave "${name}"? You will lose access to all shared grocery lists.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await rolesManageDB.leaveHousehold(householdId);
+      await fetchHouseholds();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    if (!deleteHouseholdId) return;
+
+    try {
+      await householdManageDB.deleteHousehold(deleteHouseholdId);
+
+      const remainingHouseholds = await fetchHouseholds();
+
+      // Select next available group
+      if (remainingHouseholds.length > 0) {
+        selectHousehold(remainingHouseholds[0].id);
+      }
+
+      setDeleteHouseholdId(null);
+      setDeleteHouseholdName("");
+    } catch (error) {
+      console.error("Failed to delete group:", error);
+    }
+  };
+
   useEffect(() => {
     fetchHouseholds();
     fetchInvites();
@@ -117,9 +219,20 @@ const ManageHouseholds = () => {
   return (
     <>
       <div className="flex flex-col max-w-[600px] mx-auto p-4 mt-6 gap-4">
-        <h1 className="text-[28px] font-semibold text-text-primary">
-          All Groups
-        </h1>
+        <div className="flex justify-between mb-4">
+          <h1 className="text-4xl font-semibold text-text-primary">
+            All Groups
+          </h1>
+          <button
+            onClick={() => setCreateGroupOpen(true)}
+            className="flex items-center min-h-10 gap-1 rounded-xl
+                          bg-[var(--color-primary)] text-white px-5 py-2 text-sm
+                          hover:bg-[var(--color-primary-dark)] hover:cursor-pointer transition-all ease-out duration-300"
+          >
+            <FaPlus size={14} className="mr-1.5 mt-0.5" />
+            New Group
+          </button>
+        </div>
 
         {households.map((h) => (
           <div
@@ -156,20 +269,71 @@ const ManageHouseholds = () => {
                     </button>
                   </>
                 ) : (
-                  <>
-                    <h2 className="mt-1.5 mb-4 text-xl font-semibold capitalize">
-                      {h.name}
-                    </h2>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex gap-3 items-center">
+                      <h2 className="mt-1.5 mb-4 text-xl font-semibold capitalize">
+                        {h.name}
+                      </h2>
+                      {h.role === "owner" && (
+                        <button
+                          className="flex w-6 h-6 items-center justify-center mb-2 
+                        text-slate-400 hover:text-text-primary transition"
+                          onClick={() => startEditing(h.id, h.name)}
+                        >
+                          <FaPencil size={14} />
+                        </button>
+                      )}
+                    </div>
 
-                    {h.role === "owner" && (
+                    <div className="relative">
                       <button
-                        className="flex w-6 h-6 items-center justify-center mb-1.5 text-slate-400 hover:text-white"
-                        onClick={() => startEditing(h.id, h.name)}
+                        onClick={() =>
+                          setMenuOpenId((prev) => (prev === h.id ? null : h.id))
+                        }
+                        className="flex h-9 w-9 mb-2 items-center justify-center rounded-lg
+                      text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition cursor-pointer"
                       >
-                        <FaPencil size="14" className="" />
+                        <FaEllipsisVertical size={16} />
                       </button>
-                    )}
-                  </>
+
+                      {menuOpenId === h.id && (
+                        <div
+                          className="absolute right-0 mt-1 w-44 rounded-lg
+                        bg-white shadow-lg border border-gray-200
+                          overflow-hidden z-50"
+                        >
+                          {h.role === "editor" && (
+                            <button
+                              onClick={() => {
+                                setMenuOpenId(null);
+                                handleLeaveGroup(h.id, h.name);
+                              }}
+                              className="flex w-full items-center gap-3 px-4 py-3
+            hover:bg-gray-100 cursor-pointer"
+                            >
+                              <TbDoorExit size={14} />
+                              Leave Group
+                            </button>
+                          )}
+
+                          {h.role === "owner" && (
+                            <button
+                              onClick={() => {
+                                setMenuOpenId(null);
+                                setDeleteHouseholdId(h.id);
+                                setDeleteHouseholdName(h.name);
+                              }}
+                              className="flex w-full items-center gap-3 px-4 py-3
+            text-red-600 hover:bg-red-50 cursor-pointer"
+                            >
+                              <FaTrashCan size={13} />
+                              Delete Group
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -200,7 +364,7 @@ const ManageHouseholds = () => {
                   </button>
                 )}
 
-                {h.role === "editor" && (
+                {/* {h.role === "editor" && (
                   <button
                     className="flex items-center gap-2 px-4 h-11 rounded-lg
                 text-[var(--color-text-secondary)]
@@ -225,7 +389,7 @@ const ManageHouseholds = () => {
                     <TbDoorExit size={18} />
                     Leave Group
                   </button>
-                )}
+                )} */}
               </div>
             </div>
           </div>
@@ -311,6 +475,24 @@ const ManageHouseholds = () => {
             setSelectedHouseholdId(null);
           }}
           onSend={inviteManageDB.sendInvite}
+        />
+      )}
+
+      <CreateGroupPopUp
+        open={createGroupOpen}
+        onClose={() => setCreateGroupOpen(false)}
+        onCreate={handleCreateGroup}
+      />
+
+      {deleteHouseholdId && (
+        <DeleteGroupPopUp
+          open={true}
+          householdName={deleteHouseholdName}
+          onClose={() => {
+            setDeleteHouseholdId(null);
+            setDeleteHouseholdName("");
+          }}
+          onDelete={handleDeleteGroup}
         />
       )}
     </>

@@ -14,5 +14,5 @@ export interface Household {
   id: string;
   name: string;
   created_at: string;
-  role: string;
+  role: "owner" | "editor";
 }
