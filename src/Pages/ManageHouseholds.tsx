@@ -116,7 +116,7 @@ const ManageHouseholds = () => {
 
   return (
     <>
-      <div className="flex flex-col max-w-[840px] mx-auto p-4 mt-6 gap-4">
+      <div className="flex flex-col max-w-[600px] mx-auto p-4 mt-6 gap-4">
         <h1 className="text-[28px] font-semibold text-text-primary">
           All Groups
         </h1>
@@ -232,7 +232,7 @@ const ManageHouseholds = () => {
         ))}
       </div>
 
-      <div className="flex flex-col max-w-[840px] mx-auto p-4 mt-6 gap-4">
+      <div className="flex flex-col max-w-[600px] mx-auto p-4 mt-6 gap-4">
         <h1 className="text-[28px] font-semibold text-text-primary">
           My Invites
         </h1>
