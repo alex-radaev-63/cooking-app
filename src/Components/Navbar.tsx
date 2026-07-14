@@ -1,16 +1,16 @@
 import { NavLink } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { FiMenu, FiX, FiChevronDown, FiCheck } from "react-icons/fi";
+import { FiMenu, FiX, FiChevronDown } from "react-icons/fi";
 import { useAuth } from "./context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { householdManageDB } from "../services/householdManageDB";
+// import { householdManageDB } from "../services/householdManageDB";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   // const [isRecipesOpen, setIsRecipesOpen] = useState(false);
-  const { user, logOut, openAuth, householdId, selectHousehold } = useAuth();
+  const { user, logOut, openAuth } = useAuth();
 
-  const [households, setHouseholds] = useState<any[]>([]);
+  // const [households, setHouseholds] = useState<any[]>([]);
 
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
@@ -49,20 +49,20 @@ const Navbar = () => {
   }, []);
 
   // Getting a list of user households
-  useEffect(() => {
-    if (!user) return;
+  // useEffect(() => {
+  //   if (!user) return;
 
-    const fetchHouseholds = async () => {
-      try {
-        const data = await householdManageDB.getUserHouseholds(user.id);
-        setHouseholds(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  //   const fetchHouseholds = async () => {
+  //     try {
+  //       const data = await householdManageDB.getUserHouseholds(user.id);
+  //       setHouseholds(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
 
-    fetchHouseholds();
-  }, [user]);
+  //   fetchHouseholds();
+  // }, [user]);
 
   const resetNavigation = async () => {
     await logOut();

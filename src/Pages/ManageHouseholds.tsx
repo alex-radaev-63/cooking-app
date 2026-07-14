@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../Components/context/AuthContext";
 import InvitePopUp from "../Components/households/InvitePopUp";
@@ -77,11 +77,6 @@ const ManageHouseholds = () => {
 
     try {
       const data = await householdManageDB.getUserHouseholds(user.id);
-
-      const rolePriority: Record<string, number> = {
-        owner: 1,
-        editor: 2,
-      };
 
       const sorted = [...data].sort((a, b) => {
         const rolePriority: Record<string, number> = {
