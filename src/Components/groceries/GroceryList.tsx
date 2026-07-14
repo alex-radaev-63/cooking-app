@@ -5,6 +5,7 @@ import {
   FaPencil,
   FaTrashCan,
   FaEllipsisVertical,
+  FaCheck,
 } from "react-icons/fa6";
 import { useGroceryContext } from "../context/GroceryContext";
 import { useAuth } from "../context/AuthContext";
@@ -145,9 +146,14 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
               <>
                 <button
                   onClick={handleSaveEdits}
-                  className="flex py-2 text-md font-medium text-gray-400 items-center hover:text-gray-600 cursor-pointer"
+                  className="flex mt-2 py-2 px-4 gap-2 items-center
+                    rounded-xl border border-primary
+                    text-md font-medium text-primary 
+                    hover:bg-primary-light hover:border-primary-light
+                    transition duration-250 ease-out"
                   disabled={isSavingList[id]}
                 >
+                  <FaCheck />
                   {isSavingList[id] ? "Saving..." : "Save Edits"}
                 </button>
 
@@ -276,9 +282,14 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
             <>
               <button
                 onClick={handleSaveEdits}
-                className="flex py-2 mr-4 text-md font-medium text-gray-400 items-center hover:text-gray-600 cursor-pointer"
+                className="flex mt-2 py-2 px-4 gap-2 items-center
+                rounded-xl border border-primary
+                text-md font-medium text-primary 
+                hover:bg-primary-light hover:border-primary-light
+                transition duration-250 ease-out"
                 disabled={isSavingList[id]}
               >
+                <FaCheck />
                 {isSavingList[id] ? "Saving..." : "Save Edits"}
               </button>
 
