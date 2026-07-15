@@ -135,7 +135,7 @@ const Groceries = () => {
               onClick={() => openAuth("login")}
               className="underline hover:text-text-primary mx-1.5 cursor-pointer transition-colors"
             >
-              log in
+              sign in
             </button>
             to edit grocery lists
           </span>

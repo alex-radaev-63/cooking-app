@@ -91,12 +91,15 @@ const Navbar = () => {
         <nav
           className={`hidden sm:flex ${user ? "gap-0" : "gap-2"} items-stretch h-full`}
         >
-          <NavLink
-            className="flex items-center w-full text-left px-4 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-            to="/"
-          >
-            Grocery&nbsp;Lists
-          </NavLink>
+          {user && (
+            <NavLink
+              className="flex items-center w-full text-left px-4 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              to="/"
+            >
+              Grocery&nbsp;Lists
+            </NavLink>
+          )}
+
           {/* <div className="main-nav-link relative justify-center group">
             <NavLink to="/recipes">
               <button type="button" className="flex items-center cursor-pointer">
@@ -155,6 +158,7 @@ const Navbar = () => {
                   })} */}
                   {/* Divider */}
                   {/* <div className="border-t my-2 border-[var(--color-outline)]" /> */}
+
                   <button
                     className="w-full text-left px-4 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
                     onClick={() => {
@@ -165,6 +169,7 @@ const Navbar = () => {
                   >
                     Manage groups
                   </button>
+
                   <button
                     className="w-full text-left px-4 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
                     onClick={() => {
@@ -288,29 +293,32 @@ const Navbar = () => {
                 <div className="border-t my-2 border-[var(--color-outline)]" />
               </li>
             )} */}
-            <li>
-              <button
-                className="btn-tertiary py-2 justify-start"
-                onClick={() => {
-                  setOpen(false);
-                  navigate("/");
-                }}
-              >
-                Grocery Lists
-              </button>
-            </li>
+
             {user && (
-              <li>
-                <button
-                  className="btn-tertiary py-2 justify-start"
-                  onClick={() => {
-                    setOpen(false);
-                    navigate("/households");
-                  }}
-                >
-                  Manage groups
-                </button>
-              </li>
+              <>
+                <li>
+                  <button
+                    className="btn-tertiary py-2 justify-start"
+                    onClick={() => {
+                      setOpen(false);
+                      navigate("/");
+                    }}
+                  >
+                    Grocery Lists
+                  </button>
+                </li>
+                <li>
+                  <button
+                    className="btn-tertiary py-2 justify-start"
+                    onClick={() => {
+                      setOpen(false);
+                      navigate("/households");
+                    }}
+                  >
+                    Manage groups
+                  </button>
+                </li>
+              </>
             )}
             <li className={`mt-8 ${!user ? "!mt-4" : ""} mb-4`}>
               {user ? (

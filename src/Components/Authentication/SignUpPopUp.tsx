@@ -44,7 +44,19 @@ const SignUpPopUp = ({ onClose, onSwitchToLogin }: SignUpPopUpProps) => {
 
   return (
     <div className="relative w-full max-w-[95%] sm:max-w-sm m-auto rounded-xl  p-6 bg-[var(--color-card-bg)] shadow-xl">
-      <h2 className="mb-8 text-2xl font-bold">Sign Up</h2>
+      <h2 className="mb-8 text-2xl text-center font-bold">Create Account</h2>
+
+      {/* OAuth */}
+
+      <div className="flex justify-center mt-8">
+        <SocialButton
+          icon={<FcGoogle size={24} />}
+          text="Continue with Google"
+          onClick={() => signInWithProvider("google")}
+        />
+      </div>
+
+      <div className="my-6 text-center text-slate-400 text-sm">- Or -</div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Full Name */}
@@ -102,22 +114,9 @@ const SignUpPopUp = ({ onClose, onSwitchToLogin }: SignUpPopUpProps) => {
 
         {/* Submit */}
         <button type="submit" className="w-full btn-primary min-h-12">
-          {loading ? "Creating account..." : "Sign Up"}
+          {loading ? "Creating account..." : "Create Account"}
         </button>
       </form>
-
-      {/* OAuth */}
-      <div className="mt-8 text-center text-slate-400 text-sm">
-        - Or continue with -
-      </div>
-
-      <div className="flex justify-center mt-8">
-        <SocialButton
-          icon={<FcGoogle size={24} />}
-          text="Google"
-          onClick={() => signInWithProvider("google")}
-        />
-      </div>
 
       {/* Switch */}
       <div className="text-slate-400 text-center mt-8">

@@ -90,7 +90,7 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
               </h3>
               {/* Complete status */}
               {isCompleted && (
-                <span className="flex flex-col mt-0.5 pt-0.5 h-[24px] justify-center px-3 text-xs uppercase font-bold text-[#16A34A] bg-[#DCFCE7] rounded-4xl">
+                <span className="flex flex-col mt-0.5 pt-0.5 h-[24px] justify-center px-3 text-xs uppercase font-bold text-primary bg-primary-light rounded-4xl">
                   complete
                 </span>
               )}
@@ -188,8 +188,8 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
                         min-h-6 min-w-6
                         rounded-md
                         border-[1.5px] border-slate-400
-                        checked:bg-[#16A34A]
-                        checked:border-[#16A34A]
+                        checked:bg-primary
+                        checked:border-primary
                         cursor-pointer
                         relative
                       "
