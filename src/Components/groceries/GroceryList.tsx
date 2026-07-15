@@ -83,13 +83,14 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
         <div className="flex flex-col justify-center">
           {/* Top row in a card - Date, status and context menu */}
           <div className="flex justify-between items-center">
-            <div className="flex flex-row gap-3 items-center">
+            <div className={`flex gap-3 items-center`}>
               {/* Heading (date) */}
               <h3 className="text-lg mt-1 font-semibold text-[var(--color-secondary)]">
                 {date}
               </h3>
+
               {/* Complete status */}
-              {isCompleted && (
+              {!isEditingList[id] && isCompleted && (
                 <span className="flex flex-col mt-0.5 pt-0.5 h-[24px] justify-center px-3 text-xs uppercase font-bold text-primary bg-primary-light rounded-4xl">
                   complete
                 </span>
@@ -154,7 +155,7 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
                   disabled={isSavingList[id]}
                 >
                   <FaCheck />
-                  {isSavingList[id] ? "Saving..." : "Save Edits"}
+                  {isSavingList[id] ? "Saving..." : "Save"}
                 </button>
 
                 {saveErrors[id] && (
@@ -169,20 +170,21 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
         <div className="border-t my-[-8px] border-[var(--color-outline)]" />
 
         {/* Grocery items */}
-        <div className="flex flex-col relative gap-3">
-          {!isEditingList[id] ? (
-            <>
-              <ul className="flex flex-col gap-3">
-                {displayedItems.map((item) => (
-                  <label
-                    key={item.id}
-                    className="flex flex-row gap-3 items-center min-h-[28px]"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={item.checked}
-                      onChange={() => toggleItemChecked(id, item.id)}
-                      className="
+        {(isEditingList[id] || items.length > 0) && (
+          <div className="flex flex-col relative gap-3">
+            {!isEditingList[id] ? (
+              <>
+                <ul className="flex flex-col gap-3">
+                  {displayedItems.map((item) => (
+                    <label
+                      key={item.id}
+                      className="flex flex-row gap-3 items-center min-h-[28px]"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={item.checked}
+                        onChange={() => toggleItemChecked(id, item.id)}
+                        className="
                         peer
                         appearance-none
                         min-h-6 min-w-6
@@ -193,10 +195,10 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
                         cursor-pointer
                         relative
                       "
-                    />
+                      />
 
-                    <svg
-                      className="
+                      <svg
+                        className="
                         pointer-events-none
                         absolute
                         hidden
@@ -205,111 +207,168 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
                         text-white
                         peer-checked:block
                       "
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                    >
-                      <path
-                        d="M4 10.5L8 14.5L16 6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                      >
+                        <path
+                          d="M4 10.5L8 14.5L16 6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
 
-                    <span className="text-slate-500">{item.name}</span>
-                  </label>
-                ))}
-              </ul>
+                      <span className="text-slate-500">{item.name}</span>
+                    </label>
+                  ))}
+                </ul>
 
-              {items.length > 7 && (
-                <button
-                  onClick={() => setShowAll(!showAll)}
-                  className="absolute right-0 bottom-0 flex items-center text-[var(--color-text-secondary)] cursor-pointer"
-                >
-                  {showAll ? (
-                    <>
-                      See less <FaChevronUp className="ml-2 text-sm mt-0.5" />
-                    </>
-                  ) : (
-                    <>
-                      See more <FaChevronDown className="ml-2 text-sm mt-0.5" />
-                    </>
-                  )}
-                </button>
-              )}
-            </>
-          ) : (
-            <textarea
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              ref={listitemsRef}
-              className="w-full min-h-48 bg-gray-100 text-[var(--color-text-secondary)] rounded p-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] resize-none overflow-hidden"
-              placeholder="Enter grocery items"
-              contentEditable
-            />
-          )}
-        </div>
-
-        {/* Divier */}
-        {/* <div className="border-t border-[var(--color-outline)]" /> */}
-
-        {/* Total price of groceries (grocery bill) */}
-        <div className="flex flex-col gap-4 mb-2 justify-between items-end">
-          <div className="flex w-full justify-end gap-4 items-center ">
-            <h4 className="font-semibold text-slate-500">Total</h4>
-            <div>
-              {isEditingList[id] ? (
-                <input
-                  type="number"
-                  value={total ?? 0} // default to 0 if total is null
-                  onChange={(e) => setTotal(id, parseFloat(e.target.value))}
-                  className="w-[120px] h-[40px] p-1 rounded text-right bg-gray-100 text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-text-secondary)]"
-                  step="0.01"
-                  min="0"
-                />
-              ) : (
-                <span className="text-xl font-bold">
-                  {total !== null ? `$ ${total.toFixed(2)}` : "-"}
-                </span>
-              )}
-            </div>
+                {items.length > 7 && (
+                  <button
+                    onClick={() => setShowAll(!showAll)}
+                    className="absolute right-0 bottom-0 flex items-center text-[var(--color-text-secondary)] cursor-pointer"
+                  >
+                    {showAll ? (
+                      <>
+                        See less <FaChevronUp className="ml-2 text-sm mt-0.5" />
+                      </>
+                    ) : (
+                      <>
+                        See more{" "}
+                        <FaChevronDown className="ml-2 text-sm mt-0.5" />
+                      </>
+                    )}
+                  </button>
+                )}
+              </>
+            ) : (
+              <textarea
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                ref={listitemsRef}
+                className="w-full min-h-48 bg-gray-100 text-[var(--color-text-secondary)] rounded p-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] resize-none overflow-hidden"
+                placeholder="Enter grocery items"
+                contentEditable
+              />
+            )}
           </div>
-
-          {user && !isEditingList[id] ? (
-            <></>
-          ) : (
-            <>
-              <button
-                onClick={handleSaveEdits}
-                className="flex mt-2 py-2 px-4 gap-2 items-center
-                rounded-xl border border-primary
-                text-md font-medium text-primary 
-                hover:bg-primary-light hover:border-primary-light
-                transition duration-250 ease-out"
-                disabled={isSavingList[id]}
-              >
-                <FaCheck />
-                {isSavingList[id] ? "Saving..." : "Save Edits"}
-              </button>
-
-              {saveErrors[id] && (
-                <p className="text-red-500 text-sm mt-1">{saveErrors[id]}</p>
-              )}
-            </>
-          )}
-        </div>
+        )}
 
         {items.length === 0 && !isEditingList[id] && (
           <button
-            className="flex flex-row justify-center items-center w-full h-[64px] 
-            border-2 border-dashed rounded-lg border-slate-600 text-slate-500 font-medium
-             hover:text-slate-300 hover:cursor-pointer hover:bg-slate-700/50
-             transition-all ease-out duration-250"
+            className="flex flex-row justify-center items-center 
+                w-full h-[120px] 
+                border-[1.5px] border-dashed rounded-lg border-slate-300
+                text-text-secondary/75 font-medium
+                hover:text-primary hover:bg-primary-light hover:border-primary
+                transition-all ease-out duration-250"
             onClick={() => setIsEditingList(id, true)}
           >
             + Add first item
           </button>
+        )}
+
+        {/* Total price of groceries (grocery bill) */}
+        {(isEditingList[id] || items.length > 0) && (
+          <div className="flex flex-col gap-4 mb-2 justify-between items-stretch">
+            <div className="flex flex-wrap mb-2 justify-end items-center">
+              {/* Marking list complete - setting checked status to all checkboxes */}
+              {user && isEditingList[id] ? (
+                <label className="flex items-center flex-grow gap-3 relative">
+                  <input
+                    type="checkbox"
+                    // checked={isListComplete}
+                    // onChange={() => markListComplete(id)}
+                    className="
+                peer
+                appearance-none
+                min-h-6 min-w-6
+                rounded-md
+                border-[1.5px] border-slate-400
+                checked:bg-primary
+                checked:border-primary
+                cursor-pointer
+                relative
+              "
+                  />
+                  <svg
+                    className="
+                pointer-events-none
+                absolute
+                hidden
+                h-4.5
+                w-4.5
+                ml-[2.5px]
+                text-white
+                peer-checked:block
+              "
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  >
+                    <path
+                      d="M4 10.5L8 14.5L16 6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="text-slate-600 font-medium">
+                    Mark list complete
+                  </span>
+                </label>
+              ) : (
+                <></>
+              )}
+
+              {/* Total */}
+
+              <div className="flex gap-4 items-center ">
+                <h4 className="font-semibold text-slate-500">Total</h4>
+
+                <div>
+                  {isEditingList[id] ? (
+                    <input
+                      type="number"
+                      value={total ?? 0} // default to 0 if total is null
+                      onChange={(e) => setTotal(id, parseFloat(e.target.value))}
+                      className="w-[100px] h-[40px] p-1 rounded text-right bg-gray-100 text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-text-secondary)]"
+                      step="0.01"
+                      min="0"
+                    />
+                  ) : (
+                    <span className="text-xl font-bold">
+                      {total !== null ? total.toFixed(2) : "-"}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {user && !isEditingList[id] ? (
+              <></>
+            ) : (
+              <div className="w-full flex justify-end">
+                <button
+                  onClick={handleSaveEdits}
+                  className="flex mt-2 py-2 px-4 gap-2 w-fit items-center
+                rounded-xl border border-primary
+                text-md font-medium text-primary 
+                hover:bg-primary-light hover:border-primary-light
+                transition duration-250 ease-out"
+                  disabled={isSavingList[id]}
+                >
+                  <FaCheck />
+                  {isSavingList[id] ? "Saving..." : "Save"}
+                </button>
+
+                {saveErrors[id] && (
+                  <p className="text-red-500 text-sm mt-1">{saveErrors[id]}</p>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

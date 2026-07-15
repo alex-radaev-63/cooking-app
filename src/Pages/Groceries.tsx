@@ -65,16 +65,16 @@ const Groceries = () => {
         <div className="flex flex-row justify-between min-h-10 items-end">
           <div>
             <h1 className="text-[28px] font-bold text-[var(--color-text)]">
-              Grocery Lists
+              My Lists
             </h1>
 
             {user && currentHousehold && (
-              <div className="relative mt-1" ref={dropdownRef}>
+              <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setHouseholdOpen((prev) => !prev)}
                   className="flex flex-wrap pr-4 text-smcursor-pointer text-gray-500"
                 >
-                  <span>Current group:&nbsp;</span>
+                  <span>Group:&nbsp;</span>
 
                   <div className="flex gap-1 items-center">
                     <span className="">{currentHousehold.name}</span>

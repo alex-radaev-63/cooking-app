@@ -36,6 +36,8 @@ a, button {
 
     --color-text-primary: var(--color-text-primary);
     --color-text-secondary: var(--color-text-secondary);
+
+    --color-outline-card: var(--color-outline);
 }
 
 @layer components {
