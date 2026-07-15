@@ -6,7 +6,7 @@ const TABLE_NAME = 'grocery_lists';
 export const groceriesService = {
 
     // Fetch grocery lists from Supabase
-    async getAllLists(householdId: string): Promise<GroceryList[]> {
+  async getAllLists(householdId: string): Promise<GroceryList[]> {
     const { data, error } = await supabase
       .from(TABLE_NAME)
       .select(
@@ -24,10 +24,7 @@ export const groceriesService = {
   },
 
   // Update a grocery list row by id with the full list data
-  async updateList(
-    listId: string, 
-    updatedList: Omit<GroceryList, 'id' | 'created_at'>
-  ) {
+  async updateList(listId: string, updatedList: Omit<GroceryList, 'id' | 'created_at'>) {
       const { data, error } = await supabase
         .from(TABLE_NAME)
         .update({
@@ -45,7 +42,7 @@ export const groceriesService = {
         throw error;
       }
       return data;
-    },
+  },
 
   // Create a new grocery list, returns the created row with id
   async createList(newList: Omit<GroceryList, 'id'>): Promise<GroceryList> {

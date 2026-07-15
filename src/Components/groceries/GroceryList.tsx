@@ -26,6 +26,7 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
   const [editText, setEditText] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [markCompleteOnSave, setMarkCompleteOnSave] = useState(false);
 
   const { user } = useAuth();
 
@@ -54,7 +55,14 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
 
     const newItems = reconcileItems(items, lines);
 
-    await setIsEditingList(id, false, newItems);
+    const finalItems = markCompleteOnSave
+      ? newItems.map((item) => ({
+          ...item,
+          checked: true,
+        }))
+      : newItems;
+
+    await setIsEditingList(id, false, finalItems);
   };
 
   // Set a limit for max displayed items per list (by default)
@@ -62,6 +70,13 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
 
   // Checking if list is complete
   const isCompleted = items.length > 0 && items.every((item) => item.checked);
+
+  // Set checkbox state based on whether list is complete or not at the moment user goes into editing mode
+  useEffect(() => {
+    if (isEditingList[id]) {
+      setMarkCompleteOnSave(isCompleted);
+    }
+  }, [isEditingList[id], isCompleted]);
 
   // Clicking outside of context menu closes it
   useEffect(() => {
@@ -274,35 +289,41 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
           <div className="flex flex-col gap-4 mb-2 justify-between items-stretch">
             <div className="flex flex-wrap mb-2 justify-end items-center">
               {/* Marking list complete - setting checked status to all checkboxes */}
-              {user && isEditingList[id] ? (
-                <label className="flex items-center flex-grow gap-3 relative">
+              {user && isEditingList[id] && (
+                <label
+                  className={`flex items-center flex-grow gap-3 relative ${
+                    isCompleted ? "opacity-30 cursor-not-allowed" : ""
+                  }`}
+                >
                   <input
                     type="checkbox"
-                    // checked={isListComplete}
-                    // onChange={() => markListComplete(id)}
+                    checked={markCompleteOnSave}
+                    onChange={(e) => setMarkCompleteOnSave(e.target.checked)}
                     className="
-                peer
-                appearance-none
-                min-h-6 min-w-6
-                rounded-md
-                border-[1.5px] border-slate-400
-                checked:bg-primary
-                checked:border-primary
-                cursor-pointer
-                relative
-              "
+        peer
+        appearance-none
+        min-h-6 min-w-6
+        rounded-md
+        border-[1.5px] border-slate-400
+        checked:bg-primary
+        checked:border-primary
+        disabled:cursor-not-allowed
+        cursor-pointer
+        relative
+      "
                   />
+
                   <svg
                     className="
-                pointer-events-none
-                absolute
-                hidden
-                h-4.5
-                w-4.5
-                ml-[2.5px]
-                text-white
-                peer-checked:block
-              "
+        pointer-events-none
+        absolute
+        hidden
+        h-4.5
+        w-4.5
+        ml-[2.5px]
+        text-white
+        peer-checked:block
+      "
                     viewBox="0 0 20 20"
                     fill="none"
                     stroke="currentColor"
@@ -314,12 +335,11 @@ const GroceryList = ({ id, date, items, total }: GroceryListType) => {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <span className="text-slate-600 font-medium">
+
+                  <span className="font-medium text-slate-600">
                     Mark list complete
                   </span>
                 </label>
-              ) : (
-                <></>
               )}
 
               {/* Total */}
