@@ -79,13 +79,14 @@ const Navbar = () => {
     >
       <div className="flex flex-row w-full max-w-[600px] px-4 py-2 justify-between items-center ">
         <NavLink to="/">
-          <div className="flex h-8 text-[var(--color-primary)] font-gluten font-medium text-4xl">
+          <img src="/Yummm_Logo_v1.svg" alt="Yummm logo" className="h-[40px]" />
+          {/* <div className="flex h-8 text-[var(--color-primary)] font-gluten font-medium text-4xl">
             <span className="text-4xl">
               Yum
               <span className="text-3xl">m</span>
               <span className="text-2xl">m</span>
             </span>
-          </div>
+          </div> */}
         </NavLink>
         {/* Desktop Menu */}
         <nav
